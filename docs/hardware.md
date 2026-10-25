@@ -34,12 +34,18 @@ Optional: an auto-off of 12 h for the chlorinator and the pump limits the run
 time if Home Assistant fails while they run. Intex chlorinators stop
 producing after 12 h anyway.
 
-### Interlock script
+### Interlock and watchdog script
 
 [`examples/shelly_interlock.js`](examples/shelly_interlock.js) runs on the
-Shelly Pro 3 (Settings > Scripts). It switches off channels 2 and 3 when
-channel 1 stops and prevents them from being switched on while channel 1 is
-off. Adjust the channel numbers if your wiring differs. If the dosing pump is
+Shelly Pro 3 (Settings > Scripts, enable *Run on startup*). It switches off
+channels 2 and 3 when channel 1 stops and prevents them from being switched
+on while channel 1 is off.
+
+The watchdog part calls the Home Assistant API every minute. After five
+failed calls it switches off the chlorinator and the dosing pump, so they do
+not keep running while Home Assistant is down. Enter the URL of your Home
+Assistant and a long-lived access token (preferably of a dedicated user) at
+the top of the script. Adjust the channel numbers if your wiring differs. If the dosing pump is
 on a different device, it can only be protected by its auto-off timer and by
 Pool Control.
 

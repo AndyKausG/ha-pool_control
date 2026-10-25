@@ -69,6 +69,7 @@ CONF_PH_LOCKOUT: Final = "ph_lockout_minutes"
 CONF_PH_PUMP_RATE: Final = "ph_pump_rate"
 CONF_PH_PRODUCT_DOSE: Final = "ph_product_dose"
 CONF_PH_MAX_DAILY: Final = "ph_max_daily_ml"
+CONF_PH_MAX_HOURLY: Final = "ph_max_hourly_ml"
 CONF_PH_MIN_SAFE: Final = "ph_min_safe"
 CONF_PH_QUIET_START: Final = "ph_quiet_start"
 CONF_PH_QUIET_END: Final = "ph_quiet_end"
@@ -155,6 +156,7 @@ class Problem(StrEnum):
 
     NO_FLOW = "no_flow"
     SENSOR_STUCK = "sensor_stuck"
+    SENSOR_DEVIATION = "sensor_deviation"
     WATER_QUALITY = "water_quality"
     PH_TOO_LOW = "ph_too_low"
     PH_DOSING_LOCKED = "ph_dosing_locked"
@@ -177,6 +179,10 @@ TEMP_PLAUSIBLE: Final = (-5.0, 45.0)
 ALARM_PH_MIN: Final = 6.8
 ALARM_PH_MAX: Final = 8.2
 ALARM_ORP_MIN: Final = 500.0
+
+# Maximum deviation between primary and backup sensors.
+DEVIATION_PH: Final = 0.3
+DEVIATION_ORP: Final = 100.0
 
 # Fixed controller constants.
 PUMP_MIN_START_MINUTES: Final = 15
@@ -225,6 +231,7 @@ DEFAULTS: Final[dict[str, object]] = {
     CONF_PH_PUMP_RATE: 21.0,
     CONF_PH_PRODUCT_DOSE: 300.0,
     CONF_PH_MAX_DAILY: 1500,
+    CONF_PH_MAX_HOURLY: 300,
     CONF_PH_MIN_SAFE: 6.8,
     CONF_PH_QUIET_START: "22:00:00",
     CONF_PH_QUIET_END: "07:00:00",

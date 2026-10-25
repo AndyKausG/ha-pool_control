@@ -180,6 +180,7 @@
           "ph_pump_rate": "Pump rate",
           "ph_product_dose": "Product dose",
           "ph_max_daily_ml": "Maximum per day",
+          "ph_max_hourly_ml": "Maximum per hour",
           "ph_min_safe": "pH safety minimum",
           "ph_quiet_start": "No dosing from",
           "ph_quiet_end": "No dosing until",
@@ -195,6 +196,7 @@
           "ph_lockout_minutes": "Minimum time between two pulses.",
           "ph_pump_rate": "Delivery rate of the dosing pump.",
           "ph_product_dose": "Manufacturer dosage in mL per 10 m³ per 0.1 pH.",
+          "ph_max_hourly_ml": "Protects against overdosing caused by sensor errors.",
           "ph_min_safe": "No dosing below this pH.",
           "ph_no_effect_expected_drop": "Lock dosing if the expected pH drop is reached without measurable effect."
         }

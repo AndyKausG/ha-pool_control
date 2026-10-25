@@ -297,7 +297,7 @@ class PoolCoordinator(DataUpdateCoordinator[Decision]):
         if self._ph_pump_on_at is not None:
             seconds = (now - self._ph_pump_on_at).total_seconds()
             self._ph_pump_on_at = None
-            dose = self.controller.record_ph_dose(seconds)
+            dose = self.controller.record_ph_dose(seconds, now)
             self._log(f"pH minus dosed: {dose:.0f} ml in {seconds:.0f} s")
             self._fire("ph_dosed", dose_ml=round(dose, 1), seconds=round(seconds, 1))
             self.save()

@@ -16,6 +16,8 @@ from .const import (
     ALARM_PH_MAX,
     ALARM_PH_MIN,
     CHLOR_NO_EFFECT_MIN_RISE_MV,
+    DEVIATION_ORP,
+    DEVIATION_PH,
     FALLBACK_WATER_TEMP,
     FROST_HYSTERESIS,
     ORP_PLAUSIBLE,
@@ -141,10 +143,15 @@ class PoolController:
             st.ph_session_ml = 0.0
         st.ph_session_last_pulse = now
 
-    def record_ph_dose(self, seconds: float) -> float:
+    def record_ph_dose(self, seconds: float, now: datetime) -> float:
         """Account for a finished dosing run of the given length; return ml."""
         st = self.state
         dose = chemistry.dose_for_pump_seconds(seconds, self.ph_pump_rate)
+        cutoff = now - timedelta(hours=1)
+        st.ph_dose_log = [
+            (ts, ml) for ts, ml in st.ph_dose_log if datetime.fromisoformat(ts) > cutoff
+        ]
+        st.ph_dose_log.append((now.isoformat(), round(dose, 2)))
         st.ph_dosed_today_ml += dose
         st.ph_dosed_season_ml += dose
         st.ph_session_ml += dose
@@ -311,6 +318,18 @@ class PoolController:
         if minutes_between(reading.last_reported, now) > self.settings.backup_max_age_min:
             return None
         return reading.value
+
+    def _sensors_deviate(self, snap: Snapshot, m: Measurement) -> bool:
+        """Return True if primary and backup sensors disagree significantly."""
+        if not m.primary_valid:
+            return False
+        backup_ph = self._backup_value(snap.backup_ph, PH_PLAUSIBLE, snap.now)
+        backup_orp = self._backup_value(snap.backup_orp, ORP_PLAUSIBLE, snap.now)
+        return (
+            backup_ph is not None and m.ph is not None and abs(m.ph - backup_ph) > DEVIATION_PH
+        ) or (
+            backup_orp is not None and m.orp is not None and abs(m.orp - backup_orp) > DEVIATION_ORP
+        )
 
     def _remember_measurement(self, now: datetime, m: Measurement) -> None:
         if not m.primary_valid:
@@ -591,6 +610,7 @@ class PoolController:
             (not self._ph_needs_dosing(m), "in_range"),
             (st.ph_dosed_today_ml >= s.ph_max_daily_ml, "daily_limit"),
             (st.tank_level_ml is not None and st.tank_level_ml <= 0, "tank_empty"),
+            (self.ph_dosed_last_hour(now) >= s.ph_max_hourly_ml, "hourly_limit"),
         )
         for failed, reason in checks:
             if failed:
@@ -612,10 +632,28 @@ class PoolController:
             (m.ph is not None and m.ph < s.ph_min_safe, "ph_too_low"),
             (st.ph_dosed_today_ml >= s.ph_max_daily_ml, "daily_limit"),
             (st.tank_level_ml is not None and st.tank_level_ml <= 0, "tank_empty"),
+            (self.ph_dosed_last_hour(snap.now) >= s.ph_max_hourly_ml, "hourly_limit"),
         )
         return next((reason for failed, reason in checks if failed), None)
 
-    def _ph_pulse_seconds(self, ph: float) -> float:
+    def ph_dosed_last_hour(self, now: datetime) -> float:
+        """Return the amount dosed within the last hour."""
+        cutoff = now - timedelta(hours=1)
+        return sum(ml for ts, ml in self.state.ph_dose_log if datetime.fromisoformat(ts) > cutoff)
+
+    def ph_remaining_ml(self, now: datetime) -> float:
+        """Return the amount that may still be dosed (daily, hourly and tank limit)."""
+        s = self.settings
+        st = self.state
+        remaining = min(
+            s.ph_max_daily_ml - st.ph_dosed_today_ml,
+            s.ph_max_hourly_ml - self.ph_dosed_last_hour(now),
+        )
+        if st.tank_level_ml is not None:
+            remaining = min(remaining, st.tank_level_ml)
+        return max(0.0, remaining)
+
+    def _ph_pulse_seconds(self, ph: float, now: datetime) -> float:
         s = self.settings
         st = self.state
         if s.ph_dosing_mode is PhDosingMode.PROPORTIONAL:
@@ -625,9 +663,7 @@ class PoolController:
             seconds = max(PH_PULSE_MIN_SECONDS, min(seconds, s.ph_pulse_s))
         else:
             seconds = s.ph_pulse_s
-        remaining_ml = s.ph_max_daily_ml - st.ph_dosed_today_ml
-        if st.tank_level_ml is not None:
-            remaining_ml = min(remaining_ml, st.tank_level_ml)
+        remaining_ml = self.ph_remaining_ml(now)
         return min(seconds, chemistry.pump_seconds_for_dose(remaining_ml, self.ph_pump_rate))
 
     def _decide_ph(self, snap: Snapshot, decision: Decision) -> None:
@@ -654,9 +690,9 @@ class PoolController:
         decision.ph_blocked_reason = reason
         if reason is not None or m.ph is None:
             return
-        seconds = self._ph_pulse_seconds(m.ph)
+        seconds = self._ph_pulse_seconds(m.ph, now)
         if seconds < PH_PULSE_MIN_SECONDS:
-            decision.ph_blocked_reason = "daily_limit"
+            decision.ph_blocked_reason = "limit"
             return
         decision.ph_pulse_seconds = round(seconds, 1)
         decision.ph_pulse_reason = "ph_high"
@@ -729,6 +765,8 @@ class PoolController:
             problems.add(Problem.NO_FLOW)
         if self._sensor_stuck:
             problems.add(Problem.SENSOR_STUCK)
+        if self._sensors_deviate(snap, m):
+            problems.add(Problem.SENSOR_DEVIATION)
         if (m.ph is not None and not ALARM_PH_MIN <= m.ph <= ALARM_PH_MAX) or (
             m.orp is not None and m.orp < ALARM_ORP_MIN
         ):

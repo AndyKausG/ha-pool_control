@@ -66,6 +66,7 @@ All parameters are changed in Settings > Devices & services > Pool Control >
 | Pump rate | 21 mL/min | Replaced by the calibrated rate after a refill |
 | Product dose | 300 mL | Per 10 m³ per 0.1 pH (manufacturer data) |
 | Maximum per day | 1500 mL | |
+| Maximum per hour | 300 mL | Limits overdosing caused by sensor errors |
 | pH safety minimum | 6.8 | |
 | No dosing from / until | 22:00 / 07:00 | |
 | Effect check | 0.15 pH | Expected drop before locking |

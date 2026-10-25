@@ -180,6 +180,7 @@
           "ph_pump_rate": "Förderrate",
           "ph_product_dose": "Produktdosierung",
           "ph_max_daily_ml": "Tageshöchstmenge",
+          "ph_max_hourly_ml": "Stundenhöchstmenge",
           "ph_min_safe": "pH-Sicherheitsminimum",
           "ph_quiet_start": "Keine Dosierung ab",
           "ph_quiet_end": "Keine Dosierung bis",
@@ -195,6 +196,7 @@
           "ph_lockout_minutes": "Mindestzeit zwischen zwei Pulsen.",
           "ph_pump_rate": "Förderrate der Dosierpumpe.",
           "ph_product_dose": "Herstellerangabe in mL je 10 m³ je 0,1 pH.",
+          "ph_max_hourly_ml": "Schutz vor Überdosierung bei Sensorfehlern.",
           "ph_min_safe": "Unterhalb dieses pH-Werts wird nicht dosiert.",
           "ph_no_effect_expected_drop": "Dosierung sperren, wenn die erwartete pH-Absenkung ohne messbare Wirkung erreicht ist."
         }

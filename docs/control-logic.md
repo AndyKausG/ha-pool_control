@@ -105,7 +105,7 @@ A pulse starts when all conditions hold:
 - Outside the quiet hours (default 22:00-07:00)
 - Mixing pause since the last pulse elapsed (default 10 min)
 - pH above the safety minimum and above set point + dead band
-- Daily limit not reached, tank not empty
+- Daily and hourly limit not reached, tank not empty
 
 **Pulse length:**
 
@@ -180,6 +180,7 @@ than the maximum data age:
 |---|---|
 | `no_flow` | Pump on, but no flow |
 | `sensor_stuck` | Primary value unchanged for too long |
+| `sensor_deviation` | Primary and backup differ by more than 0.3 pH or 100 mV |
 | `water_quality` | pH outside 6.8-8.2 or ORP below 500 mV |
 | `ph_too_low` | pH below the safety minimum |
 | `ph_dosing_locked` | Effect check locked dosing |

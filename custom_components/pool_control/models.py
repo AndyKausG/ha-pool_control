@@ -27,6 +27,7 @@ from .const import (
     CONF_PH_DOSING_MODE,
     CONF_PH_LOCKOUT,
     CONF_PH_MAX_DAILY,
+    CONF_PH_MAX_HOURLY,
     CONF_PH_MIN_SAFE,
     CONF_PH_NO_EFFECT,
     CONF_PH_PRODUCT_DOSE,
@@ -111,6 +112,7 @@ class Settings:
     ph_pump_rate: float
     ph_product_dose: float
     ph_max_daily_ml: float
+    ph_max_hourly_ml: float
     ph_min_safe: float
     ph_quiet_start: time
     ph_quiet_end: time
@@ -165,6 +167,7 @@ class Settings:
             ph_pump_rate=num(CONF_PH_PUMP_RATE),
             ph_product_dose=num(CONF_PH_PRODUCT_DOSE),
             ph_max_daily_ml=num(CONF_PH_MAX_DAILY),
+            ph_max_hourly_ml=num(CONF_PH_MAX_HOURLY),
             ph_min_safe=num(CONF_PH_MIN_SAFE),
             ph_quiet_start=parse_time(merged[CONF_PH_QUIET_START]),
             ph_quiet_end=parse_time(merged[CONF_PH_QUIET_END]),
@@ -274,6 +277,7 @@ class RuntimeState:
     ph_lockout_until: datetime | None = None
     last_ph_pulse: datetime | None = None
     ph_dosed_season_ml: float = 0.0
+    ph_dose_log: list[tuple[str, float]] = field(default_factory=list)
     ph_session_start_ph: float | None = None
     ph_session_ml: float = 0.0
     ph_session_last_pulse: datetime | None = None

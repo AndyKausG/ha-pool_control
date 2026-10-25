@@ -560,7 +560,7 @@ def test_ph_pulse_too_short_remaining() -> None:
     state = running(ph_dosed_today_ml=1499.5)
     decision = make_controller(state).step(snap(ph=7.5))
     assert decision.ph_pulse_seconds == 0
-    assert decision.ph_blocked_reason == "daily_limit"
+    assert decision.ph_blocked_reason == "limit"
 
 
 def test_ph_pump_stopped_by_interlock() -> None:
@@ -590,7 +590,7 @@ def test_register_and_record_dose() -> None:
     controller.register_ph_pulse_start(NOON, 50)
     assert controller.state.ph_lockout_until == NOON + timedelta(seconds=50, minutes=10)
     assert controller.state.ph_session_start_ph == 7.5
-    dose = controller.record_ph_dose(60)
+    dose = controller.record_ph_dose(60, NOON)
     assert dose == pytest.approx(21)
     state = controller.state
     assert state.ph_dosed_today_ml == pytest.approx(21)
@@ -598,6 +598,39 @@ def test_register_and_record_dose() -> None:
     assert state.tank_level_ml == pytest.approx(979)
     assert state.ph_pulses_today == 1
     assert state.ph_pump_seconds_since_refill == 60
+
+
+def test_ph_hourly_limit() -> None:
+    controller = make_controller(running())
+    for minutes in (50, 40, 30):
+        controller.record_ph_dose(240, NOON - timedelta(minutes=minutes))
+    assert controller.ph_dosed_last_hour(NOON) == pytest.approx(252)
+    decision = controller.step(snap(ph=7.5))
+    # 48 ml left in this hour -> 137 s at 21 ml/min, capped to the pulse length
+    assert decision.ph_pulse_seconds == 50
+    controller.record_ph_dose(180, NOON)
+    controller.state.ph_lockout_until = None
+    decision = controller.step(snap(NOON + timedelta(seconds=1), ph=7.5))
+    assert decision.ph_blocked_reason == "hourly_limit"
+    later = NOON + timedelta(minutes=55)
+    assert controller.ph_dosed_last_hour(later) == pytest.approx(63)
+    m = controller.step(snap(later, ph=7.5)).measurement
+    assert controller.manual_pulse_blocked_reason(snap(later), m) is None
+
+
+def test_sensor_deviation() -> None:
+    decision = make_controller(running()).step(
+        snap(ph=7.2, backup_ph=Reading(7.7, NOON), backup_orp=Reading(750, NOON))
+    )
+    assert Problem.SENSOR_DEVIATION in decision.problems
+    decision = make_controller(running()).step(
+        snap(orp=760, backup_ph=Reading(7.3, NOON), backup_orp=Reading(640, NOON))
+    )
+    assert Problem.SENSOR_DEVIATION in decision.problems
+    decision = make_controller(running()).step(
+        snap(backup_ph=Reading(7.3, NOON), backup_orp=Reading(720, NOON))
+    )
+    assert Problem.SENSOR_DEVIATION not in decision.problems
 
 
 def test_tank_refill_calibrates_rate() -> None:
