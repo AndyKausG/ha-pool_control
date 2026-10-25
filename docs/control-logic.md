@@ -306,7 +306,7 @@ Problems are shown by `binary_sensor.<pool>_problem` and fired as
 ## Maintenance reminders
 
 Reminders for pH probe calibration, ORP probe calibration, filter backwash
-and chlorinator cell cleaning (default 90, 90, 14, 90 days; 0 disables). The
+and chlorinator cell cleaning (default 30, 30, 14, 90 days; 0 disables). The
 interval starts when a reminder is enabled. Each task has a sensor with the
 next due date and a button to mark it as done. `binary_sensor.<pool>_maintenance_due`
 is on while a task is due, and `pool_control_event` with type

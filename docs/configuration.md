@@ -106,8 +106,8 @@ All parameters are changed in Settings > Devices & services > Pool Control >
 
 | Option | Default |
 |---|---|
-| pH probe calibration | 90 days |
-| ORP probe calibration | 90 days |
+| pH probe calibration | 30 days |
+| ORP probe calibration | 30 days |
 | Filter backwash | 14 days |
 | Chlorinator cell cleaning | 90 days |
 
@@ -121,7 +121,7 @@ immediately:
 | Entity | Default |
 |---|---|
 | Operating mode | Automatic |
-| Dry run | off |
+| Dry run | on for a new installation |
 | Chlorine control / pH control | on |
 | pH set point | 7.2 |
 | Free chlorine target | 2.0 ppm |

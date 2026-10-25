@@ -94,6 +94,21 @@ async def test_entities_without_optional_actuators(hass: HomeAssistant) -> None:
     assert hass.states.get("sensor.pool_status") is not None
 
 
+async def test_new_installation_starts_in_dry_run(
+    hass: HomeAssistant, config_entry: MockConfigEntry
+) -> None:
+    from unittest.mock import patch
+
+    await setup_inputs(hass)
+    config_entry.add_to_hass(hass)
+    with patch("custom_components.pool_control.coordinator.INITIAL_DRY_RUN", True):
+        assert await hass.config_entries.async_setup(config_entry.entry_id)
+        await hass.async_block_till_done()
+    # The schedule wants the pump on, but nothing is switched.
+    assert _state(hass, "switch.pool_dry_run") == "on"
+    assert _state(hass, "input_boolean.pump") == "off"
+
+
 async def test_old_entry_version_rejected(hass: HomeAssistant) -> None:
     entry = MockConfigEntry(domain=DOMAIN, version=2, data={"pool_pump": "switch.pump"})
     entry.add_to_hass(hass)

@@ -35,6 +35,11 @@ again.
 - Icon and logo shipped with the integration (Home Assistant 2026.3+)
 - Pool Control dashboard card shipped with the integration, dashboard example
 
+### Notes
+
+- A new installation starts in dry run and does not switch anything until
+  dry run is disabled.
+
 ### Removed
 
 - Recovery strategies, smart monitoring, hot weather strategy, swimming

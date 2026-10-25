@@ -65,9 +65,11 @@ the pH minus dosing pump.
 
 ### HACS
 
-1. HACS > Integrations > menu > *Custom repositories*
+1. HACS > menu > *Custom repositories*
 2. Add `https://github.com/AndyKausG/ha-pool_control` as type *Integration*
-3. Install *Pool Control* and restart Home Assistant
+3. While only beta versions exist: open the repository in HACS, menu >
+   *Redownload*, enable *Show beta versions* and select the latest version
+4. Install *Pool Control* and restart Home Assistant
 
 ### Manual
 
@@ -84,9 +86,9 @@ Settings > Devices & services > *Add integration* > *Pool Control*
 All other parameters start with defaults and can be changed in the options
 of the integration. See [docs/configuration.md](docs/configuration.md).
 
-**Recommendation:** enable *Dry run* first and let the integration run in
-parallel to an existing control for a few days. Compare the logbook entries
-before switching over.
+A new installation starts with **Dry run** enabled and does not switch
+anything until you disable it. Follow the checklist in
+[docs/season.md](docs/season.md) before the first live operation.
 
 ## Entities
 
@@ -161,6 +163,7 @@ turns problems into notifications.
 - [Configuration reference](docs/configuration.md)
 - [Hardware example and hardware interlock](docs/hardware.md)
 - [Dashboard example](docs/dashboard.md)
+- [Season start and end](docs/season.md)
 
 ## Safety notice
 

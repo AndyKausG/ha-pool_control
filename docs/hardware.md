@@ -49,15 +49,58 @@ the top of the script. Adjust the channel numbers if your wiring differs. If the
 on a different device, it can only be protected by its auto-off timer and by
 Pool Control.
 
-## Calibration
+## Calibration of the W2839
 
-- pH probe: two-point calibration (for example buffers 6.86 and 9.18). The
-  W2839 stores the calibration in the device, replacing a probe requires a
-  new calibration.
-- ORP probe: 650 mV reference solution.
-- Dosing pump rate: either measure it once (run the pump 60 s into a measuring
-  cylinder) or give the refilled amount with the action `ph_tank_refilled`
-  after each refill.
+Interval: about once a month, or when the readings differ significantly from
+a reference measurement (for example a photometer). Pool Control reminds you
+every 30 days (configurable) and offers *pH calibration done* and *ORP
+calibration done* buttons.
+
+Preparation for both probes: distilled water, three clean cups rinsed with
+distilled water, a separate stirrer per cup, paper towels.
+
+### ORP probe
+
+Requires a 650 mV reference solution (temperature dependent, 650 mV at 25 °C).
+
+1. Remove the probe, place it in distilled water for 5 minutes, move it
+   gently and wait for a stable value.
+2. Place it in the 650 mV solution and wait until the value no longer
+   changes.
+3. Hold the CAL button for 5 s to enter calibration mode.
+4. Correct the value to 650 mV with CAL- / CAL+.
+5. Wait about 5 s; the value is saved automatically.
+
+After reinstalling, the ORP probe may show completely wrong values for a
+while (for example 220 mV); the diaphragm reacts to the pressure change. Put
+the probe in salty water (pool water or a little salt in water) for
+5 minutes and install it without rinsing. The value settles shortly after.
+Pool Control ignores the readings during the stabilization time after each
+pump start.
+
+### pH probe
+
+Requires buffer solutions pH 4.01, 6.86 and 9.18 at room temperature. The
+device detects the buffer automatically; start with 6.86.
+
+1. **pH 6.86:** clean the probe with distilled water and dab it dry. Place it
+   in the buffer, move it gently and wait at least 10 minutes for an
+   absolutely stable value. Hold CAL for 3 s until the display flashes; the
+   value is saved. Dab dry and rinse with distilled water.
+2. **pH 4.01:** place the probe in the buffer, wait for a stable value, hold
+   CAL for 3 s. Dab dry and rinse.
+3. **pH 9.18:** as above. Clean and rinse the probe afterwards.
+
+Optionally repeat the 6.86 step as a check; this mid-range value matters most
+for pool water.
+
+The calibration is stored in the device, not in the probe: replacing a probe
+requires a new calibration.
+
+### Dosing pump rate
+
+Either measure it once (run the pump 60 s into a measuring cylinder) or give
+the refilled amount with the action `ph_tank_refilled` after each refill.
 
 ## Brand images
 

@@ -35,6 +35,15 @@ def expected_lingering_timers() -> bool:
     return True
 
 
+@pytest.fixture(autouse=True)
+def live_by_default() -> Generator[None]:
+    """Start new installations without dry run, unless a test checks the default."""
+    from unittest.mock import patch
+
+    with patch("custom_components.pool_control.coordinator.INITIAL_DRY_RUN", False):
+        yield
+
+
 @pytest.fixture
 def mock_setup_entry() -> Generator[None]:
     """Prevent the entry from being set up in config flow tests."""

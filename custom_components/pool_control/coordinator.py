@@ -75,6 +75,7 @@ _LOGGER = logging.getLogger(__name__)
 type PoolConfigEntry = ConfigEntry[PoolCoordinator]
 
 SAVE_DELAY_SECONDS = 10
+INITIAL_DRY_RUN = True
 
 INPUT_KEYS = (
     CONF_SOLAR_COLLECTOR_SENSOR,
@@ -156,6 +157,10 @@ class PoolCoordinator(DataUpdateCoordinator[Decision]):
         """Load persisted state and subscribe to state changes."""
         if (stored := await self._store.async_load()) is not None:
             self.controller.state = RuntimeState.from_dict(stored)
+        else:
+            # A new installation never switches anything until the user
+            # disables the dry run deliberately.
+            self.state.dry_run = INITIAL_DRY_RUN
         if self.state.tank_level_ml is None and self.settings.has_ph_pump:
             self.state.tank_level_ml = self.settings.tank_capacity_ml
 

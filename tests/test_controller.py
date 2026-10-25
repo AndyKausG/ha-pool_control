@@ -814,9 +814,14 @@ def test_maintenance_reminders() -> None:
     decision = controller.step(snap())
     assert decision.maintenance_due == []
     assert controller.maintenance_next(MaintenanceTask.BACKWASH) == NOON + timedelta(days=14)
+    assert controller.maintenance_next(MaintenanceTask.PH_CALIBRATION) == NOON + timedelta(days=30)
     later = NOON + timedelta(days=15)
     decision = controller.step(snap(later))
     assert decision.maintenance_due == [MaintenanceTask.BACKWASH]
+    assert (
+        MaintenanceTask.PH_CALIBRATION
+        in controller.step(snap(NOON + timedelta(days=31))).maintenance_due
+    )
     controller.maintenance_done(MaintenanceTask.BACKWASH, later)
     assert controller.step(snap(later)).maintenance_due == []
     assert controller.maintenance_next(MaintenanceTask.ORP_CALIBRATION) is None

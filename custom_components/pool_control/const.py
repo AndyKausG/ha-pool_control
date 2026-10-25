@@ -308,8 +308,8 @@ DEFAULTS: Final[dict[str, object]] = {
     CONF_PV_MIN_RUN: 60,
     CONF_PV_START_DELAY: 10,
     # Maintenance intervals in days, 0 disables the reminder
-    CONF_MAINT_PH_CAL: 90,
-    CONF_MAINT_ORP_CAL: 90,
+    CONF_MAINT_PH_CAL: 30,
+    CONF_MAINT_ORP_CAL: 30,
     CONF_MAINT_BACKWASH: 14,
     CONF_MAINT_CELL: 90,
 }
