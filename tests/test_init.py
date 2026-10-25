@@ -473,8 +473,8 @@ async def test_solar_and_pv(hass: HomeAssistant, freezer: FrozenDateTimeFactory)
     coordinator = entry.runtime_data
     assert coordinator.snapshot().pv_surplus is True
     assert coordinator.snapshot().solar_collector_temperature == 40
-    assert hass.states.get("binary_sensor.pool_solar_heating") is not None
-    assert hass.states.get("switch.pool_solar_control") is not None
+    assert hass.states.get("binary_sensor.pool_solar_heating_demand") is not None
+    assert hass.states.get("switch.pool_solar_heating_control") is not None
 
 
 async def test_diagnostics(hass: HomeAssistant, loaded_entry: MockConfigEntry, hass_client) -> None:

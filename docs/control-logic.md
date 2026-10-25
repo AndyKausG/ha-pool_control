@@ -73,37 +73,62 @@ the schedule, for example after adding chemicals by hand.
 
 ## Solar heating
 
-Two ways to control a solar absorber:
+Solar heating means heating the pool water with a solar absorber. It is
+independent of a photovoltaic system (see PV surplus below).
 
-- **Differential control** (collector temperature sensor configured): solar
-  heating starts when the collector is at least the switch-on difference
+Two ways to control the absorber:
+
+- **Differential control** (absorber temperature sensor configured): solar
+  heating starts when the absorber is at least the switch-on difference
   (default 6 K) warmer than the water and stops when the difference falls
   below the switch-off difference (default 3 K) or the water reaches the
   maximum temperature (default 30 °C). A minimum switching interval
   (default 10 min) prevents flapping. The water temperature is the current
-  valid reading or, while the pump is off, the last valid reading.
-- **External signal** (demand sensor configured): the switching output of an
-  existing solar controller, for example read by a Shelly input or a
-  potential-free contact, is used as demand.
+  valid reading or, while the filter pump is off, the last valid reading.
+- **External signal** (demand signal configured): the switching output of an
+  existing solar heating controller, for example read by a Shelly input, is
+  used as demand.
 
-If a solar pump or valve is configured, it is switched according to the
-demand. With *Solar requires filter pump* (default), the absorber is part of
-the filter circuit: in automatic mode the filter pump is started on demand
-(also outside the filtration window), the solar pump only runs while the
-filter pump runs, and it is part of the interlock. Run time during solar
-heating counts towards the filtration target.
+If an absorber pump or valve is configured, it is switched according to the
+demand.
+
+*Solar absorber in the filter circuit* describes the piping:
+
+- **Off (default):** the absorber has its own circuit and pump. The filter
+  pump is not affected.
+- **On:** the filter pump supplies the absorber. In automatic mode the filter
+  pump is started on demand (also outside the filtration window), the absorber
+  valve or pump only runs while the filter pump runs and is part of the
+  interlock. Run time during solar heating counts towards the filtration
+  target. Each start costs the stabilization time before readings are valid,
+  so use a minimum switching interval of at least 30 minutes in this setup.
 
 Solar heating is active in *Automatic* and *Manual* mode and can be disabled
-with `switch.<pool>_solar_control`.
+with `switch.<pool>_solar_heating_control`.
 
 ## PV surplus
 
-With a PV surplus sensor, the filtration run time is pulled forward: in
-automatic mode inside the filtration window the pump starts as soon as
-surplus is available and runs at least the minimum PV run time (default
-30 min), until the daily target is reached. The surplus sensor can be a
-binary sensor or a power sensor in W compared with the minimum surplus. With
-a pump power sensor, the pump's own consumption is added while it runs.
+With a PV surplus sensor, the filtration run time of the day is pulled
+forward into times with photovoltaic surplus. It does not add run time.
+
+Every pump start costs the stabilization time (default 30 min) without valid
+readings and therefore without chlorination or pH control. To keep the number
+of starts low:
+
+- A run is only started when surplus has been available for the start delay
+  (default 10 min), so passing clouds do not start the pump.
+- A run is only started when the remaining daily target is at least the
+  minimum run time.
+- A started run lasts at least the minimum run time (default 60 min), even if
+  the surplus disappears. With the default values each run yields at least
+  30 minutes of valid readings.
+- While surplus is available the run continues until the daily target is
+  reached.
+
+The schedule remains the fallback: target run time not covered by surplus is
+run in the regular slots. The surplus sensor can be a binary sensor or a power
+sensor in W compared with the minimum surplus. With a pump power sensor, the
+pump's own consumption is added while it runs.
 
 ## Chlorination
 

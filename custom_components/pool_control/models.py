@@ -37,6 +37,7 @@ from .const import (
     CONF_PH_QUIET_END,
     CONF_PH_QUIET_START,
     CONF_PV_MIN_RUN,
+    CONF_PV_START_DELAY,
     CONF_PV_SURPLUS_SENSOR,
     CONF_RUNTIME_DIVISOR,
     CONF_RUNTIME_MAX,
@@ -147,9 +148,10 @@ class Settings:
     solar_delta_off: float = 3.0
     solar_max_temp: float = 30.0
     solar_min_switch_min: float = 10.0
-    solar_requires_filter: bool = True
+    solar_requires_filter: bool = False
     has_pv: bool = False
-    pv_min_run_min: float = 30.0
+    pv_min_run_min: float = 60.0
+    pv_start_delay_min: float = 10.0
     maintenance_days: dict[MaintenanceTask, float] = field(default_factory=dict)
 
     @classmethod
@@ -221,6 +223,7 @@ class Settings:
             solar_requires_filter=bool(merged[CONF_SOLAR_NEEDS_FILTER]),
             has_pv=bool(merged.get(CONF_PV_SURPLUS_SENSOR)),
             pv_min_run_min=num(CONF_PV_MIN_RUN),
+            pv_start_delay_min=num(CONF_PV_START_DELAY),
             maintenance_days={
                 task: num(key)
                 for task, key in MAINTENANCE_OPTIONS.items()
@@ -284,6 +287,7 @@ _DATETIME_FIELDS = {
     "shock_until",
     "solar_changed",
     "pv_run_until",
+    "pv_surplus_since",
     "last_water_test",
     "last_valid_measurement",
     "ph_session_last_pulse",
@@ -363,6 +367,7 @@ class RuntimeState:
     solar_active: bool = False
     solar_changed: datetime | None = None
     pv_run_until: datetime | None = None
+    pv_surplus_since: datetime | None = None
 
     def to_dict(self) -> dict[str, Any]:
         """Serialize for storage."""

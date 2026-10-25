@@ -53,6 +53,7 @@ from .const import (
     CONF_PUMP_POWER_SENSOR,
     CONF_PV_MIN_RUN,
     CONF_PV_MIN_SURPLUS,
+    CONF_PV_START_DELAY,
     CONF_PV_SURPLUS_SENSOR,
     CONF_RUNTIME_DIVISOR,
     CONF_RUNTIME_MAX,
@@ -214,6 +215,7 @@ SOLAR_PV_FIELDS: list[tuple[str, Any, bool]] = [
     (CONF_SOLAR_MIN_SWITCH, _number(0, 120, 1, MINUTES), True),
     (CONF_SOLAR_NEEDS_FILTER, BOOLEAN, True),
     (CONF_PV_MIN_SURPLUS, _number(0, 10000, 10, "W"), True),
+    (CONF_PV_START_DELAY, _number(0, 120, 1, MINUTES), True),
     (CONF_PV_MIN_RUN, _number(0, 240, 5, MINUTES), True),
 ]
 

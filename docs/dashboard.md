@@ -55,7 +55,7 @@ sections:
       - type: tile
         entity: binary_sensor.pool_maintenance_due
       - type: tile
-        entity: binary_sensor.pool_solar_heating
+        entity: binary_sensor.pool_solar_heating_demand
 
   - title: Water
     cards:
@@ -143,7 +143,7 @@ sections:
           - number.pool_extra_circulation_duration
           - switch.pool_chlorine_control
           - switch.pool_ph_control
-          - switch.pool_solar_control
+          - switch.pool_solar_heating_control
           - switch.pool_dry_run
       - type: entities
         title: Water test

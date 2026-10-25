@@ -599,20 +599,34 @@ class PoolController:
             decision.solar_pump, decision.solar_reason = want, reason
 
     def _pv_wants_pump(self, snap: Snapshot, target_h: float) -> bool:
-        """Run the pump early while PV surplus is available."""
+        """Pull filtration forward while PV surplus is available.
+
+        Every pump start costs the stabilization time without valid readings,
+        so a run is only started if the surplus has been stable for the start
+        delay and the remaining daily target covers the minimum run time. A run
+        then lasts at least the minimum run time and continues while surplus
+        is available, up to the daily target.
+        """
         s = self.settings
         st = self.state
         now = snap.now
         if not s.has_pv:
             return False
-        start, end = self._window(now)
-        if not start <= now < end or st.pump_runtime_today_s >= target_h * 3600:
-            return False
-        if st.pv_run_until is not None and now < st.pv_run_until and snap.pump_on:
-            return True
         if snap.pv_surplus:
-            if not snap.pump_on:
-                st.pv_run_until = now + timedelta(minutes=s.pv_min_run_min)
+            if st.pv_surplus_since is None:
+                st.pv_surplus_since = now
+        else:
+            st.pv_surplus_since = None
+        start, end = self._window(now)
+        remaining_s = target_h * 3600 - st.pump_runtime_today_s
+        if not start <= now < end or remaining_s <= 0:
+            return False
+        if snap.pump_on:
+            in_min_run = st.pv_run_until is not None and now < st.pv_run_until
+            return in_min_run or bool(snap.pv_surplus)
+        stable = minutes_between(st.pv_surplus_since, now) >= s.pv_start_delay_min
+        if st.pv_surplus_since is not None and stable and remaining_s >= s.pv_min_run_min * 60:
+            st.pv_run_until = now + timedelta(minutes=s.pv_min_run_min)
             return True
         return False
 

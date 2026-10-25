@@ -109,8 +109,8 @@ before switching over.
 | `binary_sensor.<pool>_swimming_allowed` | On if swimming is recommended |
 | `binary_sensor.<pool>_problem` | On if any problem is active; attribute `problems` |
 | `binary_sensor.<pool>_frost_protection` | Frost protection active |
-| `binary_sensor.<pool>_solar_heating` | Solar heating demand |
-| `switch.<pool>_solar_control` | Enable or disable solar heating |
+| `binary_sensor.<pool>_solar_heating_demand` | Solar heating demand |
+| `switch.<pool>_solar_heating_control` | Enable or disable solar heating |
 | `binary_sensor.<pool>_maintenance_due` | A maintenance task is due; attribute `tasks` |
 | `sensor.<pool>_next_backwash`, `_next_ph_calibration`, ... | Next due date per task |
 | `button.<pool>_backwash_done`, ... | Mark a task as done |

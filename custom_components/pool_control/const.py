@@ -99,6 +99,7 @@ CONF_SOLAR_MIN_SWITCH: Final = "solar_min_switch_minutes"
 CONF_SOLAR_NEEDS_FILTER: Final = "solar_requires_filter_pump"
 CONF_PV_MIN_SURPLUS: Final = "pv_min_surplus"
 CONF_PV_MIN_RUN: Final = "pv_min_run_minutes"
+CONF_PV_START_DELAY: Final = "pv_start_delay_minutes"
 
 # --- Config keys: maintenance ----------------------------------------------
 CONF_MAINT_PH_CAL: Final = "maintenance_ph_calibration_days"
@@ -297,9 +298,10 @@ DEFAULTS: Final[dict[str, object]] = {
     CONF_SOLAR_DELTA_OFF: 3.0,
     CONF_SOLAR_MAX_TEMP: 30.0,
     CONF_SOLAR_MIN_SWITCH: 10,
-    CONF_SOLAR_NEEDS_FILTER: True,
+    CONF_SOLAR_NEEDS_FILTER: False,
     CONF_PV_MIN_SURPLUS: 300,
-    CONF_PV_MIN_RUN: 30,
+    CONF_PV_MIN_RUN: 60,
+    CONF_PV_START_DELAY: 10,
     # Maintenance intervals in days, 0 disables the reminder
     CONF_MAINT_PH_CAL: 90,
     CONF_MAINT_ORP_CAL: 90,

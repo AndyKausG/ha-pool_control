@@ -865,7 +865,7 @@ def test_solar_starts_filter_pump_outside_schedule() -> None:
         day=now.date().isoformat(),
         last_valid_temperature=24,
     )
-    controller = make_controller(state, **SOLAR_OPTIONS)
+    controller = make_controller(state, **SOLAR_OPTIONS, solar_requires_filter_pump=True)
     decision = controller.step(snap(now, pump=False, solar_collector_temperature=35))
     assert decision.pump is True
     assert decision.pump_reason == "solar_heating"
@@ -896,14 +896,49 @@ def test_pv_surplus_runs_pump_early() -> None:
         temp_mean_yesterday=16.0, pump_runtime_today_s=4 * 3600, day=now.date().isoformat()
     )
     controller = make_controller(state, pv_surplus_sensor="binary_sensor.pv")
-    decision = controller.step(snap(now, pump=False, pv_surplus=True))
+    # Surplus must be stable for the start delay (passing clouds).
+    assert controller.step(snap(now, pump=False, pv_surplus=True)).pump is False
+    assert (
+        controller.step(snap(now + timedelta(minutes=5), pump=False, pv_surplus=False)).pump
+        is False
+    )
+    start = now + timedelta(minutes=6)
+    assert controller.step(snap(start, pump=False, pv_surplus=True)).pump is False
+    decision = controller.step(snap(start + timedelta(minutes=10), pump=False, pv_surplus=True))
     assert decision.pump is True
     assert decision.pump_reason == "pv_surplus"
-    # Minimum run time keeps the pump running after the surplus is gone.
-    decision = controller.step(snap(now + timedelta(minutes=10), pv_surplus=False))
+    running_since = start + timedelta(minutes=10)
+    # The minimum run time (60 min) outlasts the stabilization time.
+    decision = controller.step(snap(running_since + timedelta(minutes=40), pv_surplus=False))
     assert decision.pump is True
-    decision = controller.step(snap(now + timedelta(minutes=40), pv_surplus=False))
+    decision = controller.step(snap(running_since + timedelta(minutes=61), pv_surplus=False))
     assert decision.pump is False
+
+
+def test_pv_surplus_keeps_running_while_available() -> None:
+    now = datetime(2026, 7, 1, 12, 5, tzinfo=TZ)
+    state = running(
+        90,
+        now,
+        temp_mean_yesterday=16.0,
+        pump_runtime_today_s=4 * 3600,
+        last_accumulated=now,
+        pv_run_until=now - timedelta(minutes=30),
+    )
+    controller = make_controller(state, pv_surplus_sensor="binary_sensor.pv")
+    assert controller.step(snap(now, pv_surplus=True)).pump is True
+
+
+def test_pv_surplus_needs_remaining_target_for_min_run() -> None:
+    now = datetime(2026, 7, 1, 12, 5, tzinfo=TZ)
+    state = RuntimeState(
+        temp_mean_yesterday=16.0,
+        pump_runtime_today_s=8 * 3600 - 1800,
+        day=now.date().isoformat(),
+        pv_surplus_since=now - timedelta(minutes=20),
+    )
+    controller = make_controller(state, pv_surplus_sensor="binary_sensor.pv")
+    assert controller.step(snap(now, pump=False, pv_surplus=True)).pump is False
 
 
 def test_pv_surplus_not_beyond_daily_target() -> None:

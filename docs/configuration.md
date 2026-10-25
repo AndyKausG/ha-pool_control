@@ -19,10 +19,10 @@ All parameters are changed in Settings > Devices & services > Pool Control >
 | Outdoor temperature sensor | no | Takes precedence over the weather entity |
 | Flow sensor | no | `binary_sensor`, on while water flows |
 | Pump power sensor | no | Flow indicator if no flow sensor exists |
-| Solar pump | no | Pump or valve of the solar absorber |
-| Solar collector temperature | no | Enables differential control |
-| Solar demand signal | no | Switching output of an existing solar controller |
-| PV surplus | no | Binary sensor or power sensor (W) |
+| Solar absorber pump | no | Pump or valve of the solar absorber (pool heating) |
+| Solar absorber temperature | no | Enables differential control of the solar heating |
+| Solar heating demand signal | no | Switching output of an existing solar heating controller |
+| PV surplus | no | Photovoltaic surplus, binary sensor or power sensor (W) |
 
 ## Filtration
 
@@ -92,12 +92,13 @@ All parameters are changed in Settings > Devices & services > Pool Control >
 
 | Option | Default | Description |
 |---|---|---|
-| Switch-on / switch-off difference | 6 K / 3 K | Collector minus water temperature |
-| Maximum water temperature | 30 °C | |
-| Minimum switching interval | 10 min | |
-| Solar requires filter pump | on | Absorber in the filter circuit |
-| Minimum PV surplus | 300 W | Power sensor only |
-| Minimum PV run time | 30 min | |
+| Solar heating: switch-on / switch-off difference | 6 K / 3 K | Absorber minus water temperature |
+| Solar heating: maximum water temperature | 30 °C | |
+| Solar heating: minimum switching interval | 10 min | |
+| Solar absorber in the filter circuit | off | On: the filter pump supplies the absorber. Off: own circuit and pump |
+| PV: minimum surplus | 300 W | Power sensor only |
+| PV: start delay | 10 min | Surplus must be stable this long |
+| PV: minimum run time | 60 min | Should exceed the stabilization time |
 
 ## Maintenance
 
