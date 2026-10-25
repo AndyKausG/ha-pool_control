@@ -164,6 +164,7 @@ turns problems into notifications.
 - [Hardware example and hardware interlock](docs/hardware.md)
 - [Dashboard example](docs/dashboard.md)
 - [Season start and end](docs/season.md)
+- [Trying it without hardware](docs/testing.md)
 
 ## Safety notice
 

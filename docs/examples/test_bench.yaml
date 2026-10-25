@@ -1,0 +1,91 @@
+# Pool Control test bench
+#
+# Simulated actuators and sensors to try Pool Control without hardware.
+# Copy this file to /config/packages/pool_test_bench.yaml and enable packages
+# in configuration.yaml:
+#
+#   homeassistant:
+#     packages: !include_dir_named packages
+#
+# Restart Home Assistant afterwards. Change the sliders to simulate readings;
+# the switches show what Pool Control does.
+
+input_boolean:
+  pool_test_pump:
+    name: "Pool test: filter pump"
+    icon: mdi:pump
+  pool_test_chlorinator:
+    name: "Pool test: chlorinator"
+    icon: mdi:water-plus
+  pool_test_ph_pump:
+    name: "Pool test: pH minus pump"
+    icon: mdi:beaker-minus-outline
+
+input_number:
+  pool_test_ph:
+    name: "Pool test: pH"
+    min: 6.5
+    max: 8.5
+    step: 0.01
+    initial: 7.4
+    mode: slider
+  pool_test_orp:
+    name: "Pool test: ORP"
+    min: 400
+    max: 900
+    step: 1
+    initial: 720
+    unit_of_measurement: mV
+    mode: slider
+  pool_test_temperature:
+    name: "Pool test: water temperature"
+    min: 5
+    max: 35
+    step: 0.1
+    initial: 24
+    unit_of_measurement: °C
+    mode: slider
+  pool_test_salt:
+    name: "Pool test: salt"
+    min: 0
+    max: 6000
+    step: 50
+    initial: 3200
+    unit_of_measurement: ppm
+    mode: slider
+
+# Trigger-based template sensors report every minute like a real probe, so
+# the readings do not count as stale.
+template:
+  - triggers:
+      - trigger: time_pattern
+        minutes: /1
+      - trigger: state
+        entity_id:
+          - input_number.pool_test_ph
+          - input_number.pool_test_orp
+          - input_number.pool_test_temperature
+          - input_number.pool_test_salt
+    sensor:
+      - name: "Pool test pH"
+        unique_id: pool_test_ph
+        device_class: ph
+        state_class: measurement
+        state: "{{ states('input_number.pool_test_ph') | float(0) }}"
+      - name: "Pool test ORP"
+        unique_id: pool_test_orp
+        device_class: voltage
+        unit_of_measurement: mV
+        state_class: measurement
+        state: "{{ states('input_number.pool_test_orp') | float(0) }}"
+      - name: "Pool test water temperature"
+        unique_id: pool_test_temperature
+        device_class: temperature
+        unit_of_measurement: °C
+        state_class: measurement
+        state: "{{ states('input_number.pool_test_temperature') | float(0) }}"
+      - name: "Pool test salt"
+        unique_id: pool_test_salt
+        unit_of_measurement: ppm
+        state_class: measurement
+        state: "{{ states('input_number.pool_test_salt') | float(0) }}"
