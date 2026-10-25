@@ -24,7 +24,16 @@ from homeassistant.const import (
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddConfigEntryEntitiesCallback
 
-from .const import MaintenanceTask, MeasurementSource, Status, SwimmingStatus
+from .const import (
+    CONF_CHLORINATOR,
+    CONF_PH_PUMP,
+    CONF_PUMP,
+    CONF_SOLAR_PUMP,
+    MaintenanceTask,
+    MeasurementSource,
+    Status,
+    SwimmingStatus,
+)
 from .coordinator import PoolConfigEntry, PoolCoordinator
 from .entity import PoolEntity
 
@@ -68,6 +77,11 @@ SENSORS: tuple[PoolSensorDescription, ...] = (
             "ph_dosing_blocked_reason": c.data.ph_blocked_reason,
             "measurement_invalid_reason": c.data.measurement.invalid_reason,
             "problems": sorted(problem.value for problem in c.data.problems),
+            "actuators": {
+                key: entity_id
+                for key in (CONF_PUMP, CONF_CHLORINATOR, CONF_PH_PUMP, CONF_SOLAR_PUMP)
+                if (entity_id := c.entity(key))
+            },
         },
     ),
     PoolSensorDescription(

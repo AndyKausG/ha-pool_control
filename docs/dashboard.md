@@ -1,4 +1,33 @@
-# Dashboard example
+# Dashboard
+
+## Pool Control card
+
+The integration ships its own card. It is loaded automatically, no resource
+has to be added. Add it via *Edit dashboard > Add card > Pool Control* or in
+YAML:
+
+```yaml
+type: custom:pool-control-card
+device_id: <device id>   # optional, defaults to the first Pool Control device
+title: Pool              # optional
+```
+
+![Pool Control card](card.png)
+
+The card shows:
+
+- operating mode (selectable), status and dry-run indicator
+- a schematic of pump, chlorinator, pH minus pump and solar with live state
+- pH and ORP with set points, swimming status, saturation index
+- filtration progress of the day and pH minus tank level
+- active problems and due maintenance
+- actions: extra circulation, shock chlorination, manual pH pulse, tank
+  refilled (with confirmation)
+
+Clicking a value opens its details. The card follows the language of the
+user (English, German).
+
+## Example view with standard cards
 
 A dashboard view built from standard cards. Replace `pool` with the name of
 your device (entity IDs are derived from it). Add it via *Edit dashboard >

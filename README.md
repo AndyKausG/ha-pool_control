@@ -1,4 +1,4 @@
-<p align="center"><img src="brand/logo@2x.png" alt="Pool Control" width="360"></p>
+<p align="center"><img src="custom_components/pool_control/brand/logo@2x.png" alt="Pool Control" width="360"></p>
 
 # Pool Control
 
@@ -42,12 +42,14 @@ the pH minus dosing pump.
 - **Swimming assessment** - Binary sensor and status based on pH and ORP.
 - **Dry run** - Calculates all decisions and writes them to the logbook
   without switching anything.
+- **Dashboard card** - Shipped with the integration: schematic, readings,
+  progress, problems and actions.
 - **Home Assistant standards** - Config and options flow, translated entities
   (English, German), logbook entries, events, repairs, diagnostics.
 
 ## Requirements
 
-- Home Assistant 2026.2 or newer
+- Home Assistant 2026.2 or newer (icons in the UI from 2026.3)
 - A switchable filter pump (`switch`, `input_boolean` or `light`)
 - pH, ORP and water temperature sensors in the circulation (flow cell)
 - Optional: chlorinator switch, pH minus dosing pump switch, backup sensors,

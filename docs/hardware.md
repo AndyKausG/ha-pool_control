@@ -61,8 +61,7 @@ Pool Control.
 
 ## Brand images
 
-`brand/` contains the icon and logo in the sizes required by the
-[Home Assistant brands repository](https://github.com/home-assistant/brands)
-(`icon.png` 256x256, `icon@2x.png` 512x512, `logo.png`, `logo@2x.png`) plus
-the SVG sources. Home Assistant and HACS show the icon once it has been added
-to `custom_integrations/pool_control` in that repository.
+`custom_components/pool_control/brand/` contains icon and logo
+(`icon.png` 256x256, `icon@2x.png` 512x512, `logo.png`, `logo@2x.png`).
+Home Assistant 2026.3 and newer shows them without an entry in the central
+brands repository. The SVG sources are in `docs/brand/`.

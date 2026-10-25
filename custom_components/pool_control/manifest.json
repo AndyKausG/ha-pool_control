@@ -1,8 +1,14 @@
 {
   "domain": "pool_control",
   "name": "Pool Control",
-  "after_dependencies": ["logbook"],
-  "codeowners": ["@AndyKausG"],
+  "after_dependencies": [
+    "frontend",
+    "http",
+    "logbook"
+  ],
+  "codeowners": [
+    "@AndyKausG"
+  ],
   "config_flow": true,
   "documentation": "https://github.com/AndyKausG/ha-pool_control",
   "integration_type": "device",

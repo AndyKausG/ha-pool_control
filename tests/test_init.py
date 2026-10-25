@@ -482,3 +482,17 @@ async def test_diagnostics(hass: HomeAssistant, loaded_entry: MockConfigEntry, h
     assert result["options"]["pump"] == "input_boolean.pump"
     assert result["state"]["mode"] == "auto"
     assert result["decision"]["status"] == "stabilizing"
+
+
+async def test_card_registered(hass: HomeAssistant, config_entry: MockConfigEntry) -> None:
+    from unittest.mock import AsyncMock, MagicMock, patch
+
+    from custom_components.pool_control import CARD_FILE, _async_register_card
+
+    assert CARD_FILE.is_file()
+    hass.http = MagicMock(async_register_static_paths=AsyncMock())
+    hass.config.components.add("frontend")
+    with patch("homeassistant.components.frontend.add_extra_js_url") as add_js:
+        await _async_register_card(hass)
+    hass.http.async_register_static_paths.assert_awaited_once()
+    assert add_js.call_args[0][1].startswith("/pool_control/pool-control-card.js?v=")

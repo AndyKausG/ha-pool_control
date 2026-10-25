@@ -32,7 +32,8 @@ again.
 - Maintenance reminders
 - Solar heating (differential control or external signal) and PV surplus
   filtration
-- Icon, logo and dashboard example
+- Icon and logo shipped with the integration (Home Assistant 2026.3+)
+- Pool Control dashboard card shipped with the integration, dashboard example
 
 ### Removed
 
