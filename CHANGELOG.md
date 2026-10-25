@@ -1,0 +1,33 @@
+# Changelog
+
+All notable changes to this project are documented in this file. The format
+is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and the
+project uses [Semantic Versioning](https://semver.org/).
+
+## [1.0.0] - unreleased
+
+Complete rewrite. Existing config entries are not migrated and must be set up
+again.
+
+### Added
+
+- Temperature based filtration schedule with blocks, catch-up and demand
+  extension
+- ORP controlled chlorination with pH compensated set point
+- pH minus dosing with pulses, mixing pause, quiet hours, daily limit, effect
+  check and learning of the product dose
+- Tank tracking with pump rate calibration on refill
+- Frost protection based on weather or outdoor temperature
+- Measurement validation (stabilization, age, plausibility, stuck values) and
+  backup sensors
+- Operating modes, dry run, extra circulation
+- Swimming assessment
+- Logbook entries, `pool_control_event`, repairs, diagnostics
+- Notification blueprint and Shelly interlock script
+- English and German translations
+
+### Removed
+
+- Recovery strategies, smart monitoring, hot weather strategy, swimming
+  detection, adaptive learning and the `reload_config` service of the 0.x
+  versions

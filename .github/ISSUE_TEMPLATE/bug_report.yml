@@ -1,0 +1,33 @@
+name: Bug report
+description: Report a problem with Pool Control
+labels: [bug]
+body:
+  - type: textarea
+    id: description
+    attributes:
+      label: Description
+      description: What happened and what did you expect?
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: Pool Control version
+    validations:
+      required: true
+  - type: input
+    id: ha_version
+    attributes:
+      label: Home Assistant version
+    validations:
+      required: true
+  - type: textarea
+    id: diagnostics
+    attributes:
+      label: Diagnostics
+      description: Attach the diagnostics file (Settings > Devices > Pool > Download diagnostics).
+  - type: textarea
+    id: logs
+    attributes:
+      label: Logs
+      render: text

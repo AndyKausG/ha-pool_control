@@ -1,0 +1,36 @@
+blueprint:
+  name: Pool Control - notify about problems
+  description: >
+    Runs the given actions when Pool Control reports a problem. The problem
+    code (for example ph_tank_low) is available as {{ problem }}.
+  domain: automation
+  source_url: https://github.com/AndyKausG/ha-pool_control/blob/main/blueprints/automation/pool_control/notify_problems.yaml
+  input:
+    pool:
+      name: Pool
+      selector:
+        config_entry:
+          integration: pool_control
+    actions:
+      name: Actions
+      description: For example a notification to your phone.
+      selector:
+        action: {}
+
+triggers:
+  - trigger: event
+    event_type: pool_control_event
+    event_data:
+      type: problem
+
+conditions:
+  - condition: template
+    value_template: "{{ trigger.event.data.entry_id == entry_id }}"
+
+variables:
+  entry_id: !input pool
+  problem: "{{ trigger.event.data.problem }}"
+
+actions: !input actions
+
+mode: queued

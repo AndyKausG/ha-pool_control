@@ -1,0 +1,110 @@
+start_boost:
+  fields:
+    config_entry_id:
+      required: true
+      selector:
+        config_entry:
+          integration: pool_control
+    hours:
+      selector:
+        number:
+          min: 0.5
+          max: 24
+          step: 0.5
+          unit_of_measurement: h
+
+stop_boost:
+  fields:
+    config_entry_id:
+      required: true
+      selector:
+        config_entry:
+          integration: pool_control
+
+ph_tank_refilled:
+  fields:
+    config_entry_id:
+      required: true
+      selector:
+        config_entry:
+          integration: pool_control
+    refilled_ml:
+      selector:
+        number:
+          min: 0
+          max: 50000
+          step: 10
+          unit_of_measurement: mL
+          mode: box
+    level_ml:
+      selector:
+        number:
+          min: 0
+          max: 50000
+          step: 10
+          unit_of_measurement: mL
+          mode: box
+
+reset_ph_lock:
+  fields:
+    config_entry_id:
+      required: true
+      selector:
+        config_entry:
+          integration: pool_control
+
+reset_season:
+  fields:
+    config_entry_id:
+      required: true
+      selector:
+        config_entry:
+          integration: pool_control
+
+calculate_ph_correction:
+  fields:
+    config_entry_id:
+      required: true
+      selector:
+        config_entry:
+          integration: pool_control
+    current_ph:
+      selector:
+        number:
+          min: 6
+          max: 9
+          step: 0.01
+          mode: box
+    target_ph:
+      selector:
+        number:
+          min: 6
+          max: 9
+          step: 0.01
+          mode: box
+
+calculate_salt_correction:
+  fields:
+    config_entry_id:
+      required: true
+      selector:
+        config_entry:
+          integration: pool_control
+    current_ppm:
+      required: true
+      selector:
+        number:
+          min: 0
+          max: 10000
+          step: 10
+          unit_of_measurement: ppm
+          mode: box
+    target_ppm:
+      default: 3500
+      selector:
+        number:
+          min: 0
+          max: 10000
+          step: 10
+          unit_of_measurement: ppm
+          mode: box

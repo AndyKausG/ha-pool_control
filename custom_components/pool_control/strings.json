@@ -1,0 +1,524 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Pool Control",
+        "description": "Name, pool volume and actuators.",
+        "data": {
+          "name": "Name",
+          "volume": "Pool volume",
+          "pump": "Filter pump",
+          "chlorinator": "Salt chlorinator",
+          "ph_pump": "pH minus dosing pump"
+        },
+        "data_description": {
+          "name": "Name of the pool device.",
+          "volume": "Water volume in m³.",
+          "pump": "Switch of the filter pump.",
+          "chlorinator": "Switch of the salt water chlorinator (optional).",
+          "ph_pump": "Switch of the dosing pump (optional)."
+        }
+      },
+      "sensors": {
+        "title": "Sensors",
+        "description": "Primary sensors in the flow cell and optional additional inputs.",
+        "data": {
+          "ph_sensor": "pH sensor",
+          "orp_sensor": "ORP sensor",
+          "temperature_sensor": "Water temperature sensor",
+          "backup_ph_sensor": "Backup pH sensor",
+          "backup_orp_sensor": "Backup ORP sensor",
+          "backup_temperature_sensor": "Backup water temperature sensor",
+          "salt_sensor": "Salt sensor",
+          "weather": "Weather",
+          "outdoor_temperature_sensor": "Outdoor temperature sensor",
+          "flow_sensor": "Flow sensor",
+          "pump_power_sensor": "Pump power sensor"
+        },
+        "data_description": {
+          "ph_sensor": "Primary pH sensor in the flow cell.",
+          "orp_sensor": "Primary ORP (redox) sensor in mV.",
+          "temperature_sensor": "Primary water temperature sensor.",
+          "backup_ph_sensor": "Used for monitoring while the pump is off (optional).",
+          "backup_orp_sensor": "Used for monitoring while the pump is off (optional).",
+          "backup_temperature_sensor": "Used while the pump is off (optional).",
+          "salt_sensor": "Salt concentration in ppm, used for warnings only (optional).",
+          "weather": "Weather entity providing the outdoor temperature (optional).",
+          "outdoor_temperature_sensor": "Takes precedence over the weather entity (optional).",
+          "flow_sensor": "Binary sensor that is on while water flows (optional).",
+          "pump_power_sensor": "Power of the filter pump, used as flow indicator (optional)."
+        }
+      }
+    },
+    "error": {
+      "window_invalid": "The window end must be after its start.",
+      "runtime_invalid": "The maximum must not be lower than the minimum.",
+      "pulse_exceeds_auto_off": "The pulse must be at least 5 s shorter than the hardware auto-off.",
+      "salt_invalid": "The maximum must be higher than the minimum.",
+      "swim_ph_invalid": "The maximum must be higher than the minimum.",
+      "duplicate_actuator": "Each actuator needs its own switch."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Pool Control",
+        "menu_options": {
+          "entities": "Entities",
+          "filtration": "Filtration",
+          "measurement": "Measurement",
+          "chlorine": "Chlorination",
+          "ph_dosing": "pH dosing",
+          "frost_swimming": "Frost protection and swimming"
+        }
+      },
+      "entities": {
+        "title": "Entities",
+        "data": {
+          "pump": "Filter pump",
+          "chlorinator": "Salt chlorinator",
+          "ph_pump": "pH minus dosing pump",
+          "ph_sensor": "pH sensor",
+          "orp_sensor": "ORP sensor",
+          "temperature_sensor": "Water temperature sensor",
+          "backup_ph_sensor": "Backup pH sensor",
+          "backup_orp_sensor": "Backup ORP sensor",
+          "backup_temperature_sensor": "Backup water temperature sensor",
+          "salt_sensor": "Salt sensor",
+          "weather": "Weather",
+          "outdoor_temperature_sensor": "Outdoor temperature sensor",
+          "flow_sensor": "Flow sensor",
+          "pump_power_sensor": "Pump power sensor"
+        },
+        "data_description": {
+          "pump": "Switch of the filter pump.",
+          "chlorinator": "Switch of the salt water chlorinator (optional).",
+          "ph_pump": "Switch of the dosing pump (optional).",
+          "ph_sensor": "Primary pH sensor in the flow cell.",
+          "orp_sensor": "Primary ORP (redox) sensor in mV.",
+          "temperature_sensor": "Primary water temperature sensor.",
+          "backup_ph_sensor": "Used for monitoring while the pump is off (optional).",
+          "backup_orp_sensor": "Used for monitoring while the pump is off (optional).",
+          "backup_temperature_sensor": "Used while the pump is off (optional).",
+          "salt_sensor": "Salt concentration in ppm, used for warnings only (optional).",
+          "weather": "Weather entity providing the outdoor temperature (optional).",
+          "outdoor_temperature_sensor": "Takes precedence over the weather entity (optional).",
+          "flow_sensor": "Binary sensor that is on while water flows (optional).",
+          "pump_power_sensor": "Power of the filter pump, used as flow indicator (optional)."
+        }
+      },
+      "filtration": {
+        "title": "Filtration",
+        "data": {
+          "volume": "Pool volume",
+          "filtration_window_start": "Filtration window start",
+          "filtration_window_end": "Filtration window end",
+          "filtration_blocks": "Filtration blocks",
+          "runtime_divisor": "Temperature divisor",
+          "runtime_min_hours": "Minimum daily filtration",
+          "runtime_max_hours": "Maximum daily filtration",
+          "demand_extension": "Demand extension",
+          "pump_min_power": "Minimum pump power"
+        },
+        "data_description": {
+          "volume": "Water volume in m³.",
+          "filtration_window_start": "Earliest time the pump runs on schedule.",
+          "filtration_window_end": "Latest time the pump runs on schedule.",
+          "filtration_blocks": "Number of runs the daily filtration time is split into.",
+          "runtime_divisor": "Daily filtration hours = water temperature / divisor.",
+          "runtime_min_hours": "Lower limit of the daily filtration time.",
+          "runtime_max_hours": "Upper limit including demand extension.",
+          "demand_extension": "Keep the pump running while chlorination or pH correction is needed.",
+          "pump_min_power": "Below this power the pump is considered not pumping."
+        }
+      },
+      "measurement": {
+        "title": "Measurement",
+        "data": {
+          "stabilization_minutes": "Stabilization time",
+          "sensor_max_age_minutes": "Maximum sensor age",
+          "stuck_detection_minutes": "Stuck sensor detection",
+          "backup_max_age_minutes": "Maximum backup sensor age"
+        },
+        "data_description": {
+          "stabilization_minutes": "Time after pump start before readings are used.",
+          "sensor_max_age_minutes": "Readings older than this are invalid.",
+          "stuck_detection_minutes": "A value unchanged for this time while pumping is invalid (0 disables).",
+          "backup_max_age_minutes": "Backup readings older than this are ignored."
+        }
+      },
+      "chlorine": {
+        "title": "Chlorination",
+        "data": {
+          "orp_target_mode": "ORP set point",
+          "orp_fixed_target": "Fixed ORP set point",
+          "orp_hysteresis": "ORP hysteresis",
+          "chlorinator_min_on_minutes": "Chlorinator minimum on time",
+          "chlorinator_min_off_minutes": "Chlorinator minimum off time",
+          "chlorinator_max_daily_hours": "Chlorinator maximum per day",
+          "chlorinator_no_effect_hours": "Chlorinator effect check",
+          "orp_holdoff_after_dosing_minutes": "ORP hold-off after dosing",
+          "salt_min": "Minimum salt",
+          "salt_max": "Maximum salt"
+        },
+        "data_description": {
+          "orp_target_mode": "pH compensated uses the free chlorine target, fixed uses a constant value.",
+          "orp_fixed_target": "Used in fixed mode and as fallback without pH value.",
+          "orp_hysteresis": "Switch on below set point minus, off above set point plus this value.",
+          "chlorinator_no_effect_hours": "Warn if ORP has not risen after this run time.",
+          "orp_holdoff_after_dosing_minutes": "No chlorinator switching for this time after a pH pulse."
+        }
+      },
+      "ph_dosing": {
+        "title": "pH dosing",
+        "data": {
+          "ph_dosing_mode": "Pulse length",
+          "ph_deadband": "pH dead band",
+          "ph_pulse_seconds": "Pulse length",
+          "ph_pump_auto_off_seconds": "Hardware auto-off",
+          "ph_lockout_minutes": "Mixing pause",
+          "ph_pump_rate": "Pump rate",
+          "ph_product_dose": "Product dose",
+          "ph_max_daily_ml": "Maximum per day",
+          "ph_min_safe": "pH safety minimum",
+          "ph_quiet_start": "No dosing from",
+          "ph_quiet_end": "No dosing until",
+          "ph_no_effect_expected_drop": "Effect check",
+          "tank_capacity_ml": "Tank capacity",
+          "tank_warning_ml": "Tank warning level"
+        },
+        "data_description": {
+          "ph_dosing_mode": "Fixed pulse or proportional to the deviation.",
+          "ph_deadband": "Dose only above set point plus this value.",
+          "ph_pulse_seconds": "Fixed pulse length and maximum in proportional mode.",
+          "ph_pump_auto_off_seconds": "Auto-off time configured in the relay (0 if none).",
+          "ph_lockout_minutes": "Minimum time between two pulses.",
+          "ph_pump_rate": "Delivery rate of the dosing pump.",
+          "ph_product_dose": "Manufacturer dosage in mL per 10 m³ per 0.1 pH.",
+          "ph_min_safe": "No dosing below this pH.",
+          "ph_no_effect_expected_drop": "Lock dosing if the expected pH drop is reached without measurable effect."
+        }
+      },
+      "frost_swimming": {
+        "title": "Frost protection and swimming",
+        "data": {
+          "frost_temperature": "Frost protection temperature",
+          "frost_mode": "Frost protection mode",
+          "frost_on_minutes": "Pump minutes per hour",
+          "swim_ph_min": "Swimming: minimum pH",
+          "swim_ph_max": "Swimming: maximum pH",
+          "swim_orp_min": "Swimming: minimum ORP",
+          "swim_data_max_age_hours": "Swimming: maximum data age"
+        },
+        "data_description": {
+          "frost_temperature": "Frost protection starts below this outdoor temperature.",
+          "frost_on_minutes": "Run time per hour in interval mode.",
+          "swim_data_max_age_hours": "Older measurements are not used for the assessment."
+        }
+      }
+    },
+    "error": {
+      "window_invalid": "The window end must be after its start.",
+      "runtime_invalid": "The maximum must not be lower than the minimum.",
+      "pulse_exceeds_auto_off": "The pulse must be at least 5 s shorter than the hardware auto-off.",
+      "salt_invalid": "The maximum must be higher than the minimum.",
+      "swim_ph_invalid": "The maximum must be higher than the minimum.",
+      "duplicate_actuator": "Each actuator needs its own switch."
+    }
+  },
+  "selector": {
+    "orp_target_mode": {
+      "options": {
+        "ph_compensated": "pH compensated",
+        "fixed": "Fixed"
+      }
+    },
+    "ph_dosing_mode": {
+      "options": {
+        "fixed": "Fixed",
+        "proportional": "Proportional"
+      }
+    },
+    "frost_mode": {
+      "options": {
+        "interval": "Interval",
+        "continuous": "Continuous"
+      }
+    }
+  },
+  "entity": {
+    "sensor": {
+      "ph": {
+        "name": "pH"
+      },
+      "orp": {
+        "name": "ORP"
+      },
+      "water_temperature": {
+        "name": "Water temperature"
+      },
+      "orp_target": {
+        "name": "ORP set point"
+      },
+      "filtration_target": {
+        "name": "Filtration target"
+      },
+      "pump_runtime_today": {
+        "name": "Pump runtime today"
+      },
+      "next_filtration": {
+        "name": "Next filtration"
+      },
+      "chlorinator_runtime_today": {
+        "name": "Chlorinator runtime today"
+      },
+      "ph_dosed_today": {
+        "name": "pH minus dosed today"
+      },
+      "ph_dosed_season": {
+        "name": "pH minus dosed this season"
+      },
+      "ph_tank_level": {
+        "name": "pH minus tank level"
+      },
+      "ph_tank_level_percent": {
+        "name": "pH minus tank level percent"
+      },
+      "ph_pump_rate": {
+        "name": "Dosing pump rate"
+      },
+      "ph_product_dose_learned": {
+        "name": "Learned product dose"
+      },
+      "status": {
+        "name": "Status",
+        "state": {
+          "off": "Off",
+          "winter": "Winter",
+          "maintenance": "Maintenance",
+          "frost_protection": "Frost protection",
+          "dosing": "Dosing",
+          "chlorinating": "Chlorinating",
+          "stabilizing": "Stabilizing",
+          "filtering": "Filtering",
+          "idle": "Idle"
+        }
+      },
+      "measurement_source": {
+        "name": "Measurement source",
+        "state": {
+          "primary": "Primary",
+          "backup": "Backup",
+          "none": "None"
+        }
+      },
+      "swimming_status": {
+        "name": "Swimming status",
+        "state": {
+          "ok": "Swimming allowed",
+          "ph_low": "pH too low",
+          "ph_high": "pH too high",
+          "orp_low": "ORP too low",
+          "dosing": "Dosing in progress",
+          "no_data": "No data"
+        }
+      }
+    },
+    "binary_sensor": {
+      "problem": {
+        "name": "Problem"
+      },
+      "swimming_allowed": {
+        "name": "Swimming allowed"
+      },
+      "measurement_valid": {
+        "name": "Measurement valid"
+      },
+      "frost_protection": {
+        "name": "Frost protection"
+      },
+      "ph_dosing_locked": {
+        "name": "pH dosing locked"
+      },
+      "ph_tank_low": {
+        "name": "pH minus tank low"
+      }
+    },
+    "button": {
+      "start_boost": {
+        "name": "Start extra circulation"
+      },
+      "stop_boost": {
+        "name": "Stop extra circulation"
+      },
+      "ph_tank_refilled": {
+        "name": "pH minus tank refilled"
+      },
+      "ph_manual_pulse": {
+        "name": "Manual pH dosing pulse"
+      },
+      "ph_reset_lock": {
+        "name": "Release pH dosing lock"
+      }
+    },
+    "number": {
+      "ph_target": {
+        "name": "pH set point"
+      },
+      "chlorine_target": {
+        "name": "Free chlorine target"
+      },
+      "boost_hours": {
+        "name": "Extra circulation duration"
+      }
+    },
+    "select": {
+      "mode": {
+        "name": "Operating mode",
+        "state": {
+          "auto": "Automatic",
+          "manual": "Manual",
+          "maintenance": "Maintenance",
+          "winter": "Winter",
+          "off": "Off"
+        }
+      }
+    },
+    "switch": {
+      "dry_run": {
+        "name": "Dry run"
+      },
+      "chlorine_control": {
+        "name": "Chlorine control"
+      },
+      "ph_control": {
+        "name": "pH control"
+      }
+    }
+  },
+  "exceptions": {
+    "boost_not_possible": {
+      "message": "Extra circulation is not available in winter or off mode."
+    },
+    "no_ph_pump": {
+      "message": "No pH dosing pump is configured."
+    },
+    "pulse_not_possible": {
+      "message": "A dosing pulse is not possible: {reason}."
+    },
+    "entry_not_found": {
+      "message": "Config entry {entry_id} was not found."
+    },
+    "entry_not_loaded": {
+      "message": "Config entry {entry_id} is not loaded."
+    },
+    "no_ph_value": {
+      "message": "No pH value available. Provide current_ph."
+    }
+  },
+  "issues": {
+    "missing_entity": {
+      "title": "Entity of {name} not found",
+      "description": "The configured entity {entity_id} does not exist. Fix the assignment in the integration options."
+    }
+  },
+  "services": {
+    "start_boost": {
+      "name": "Start extra circulation",
+      "description": "Runs the filter pump for an additional period.",
+      "fields": {
+        "config_entry_id": {
+          "name": "Pool",
+          "description": "The Pool Control entry."
+        },
+        "hours": {
+          "name": "Duration",
+          "description": "Defaults to the configured duration."
+        }
+      }
+    },
+    "stop_boost": {
+      "name": "Stop extra circulation",
+      "description": "Cancels an active extra circulation.",
+      "fields": {
+        "config_entry_id": {
+          "name": "Pool",
+          "description": "The Pool Control entry."
+        }
+      }
+    },
+    "ph_tank_refilled": {
+      "name": "pH minus tank refilled",
+      "description": "Records a refill. The refilled amount calibrates the pump rate.",
+      "fields": {
+        "config_entry_id": {
+          "name": "Pool",
+          "description": "The Pool Control entry."
+        },
+        "refilled_ml": {
+          "name": "Refilled amount",
+          "description": "Amount poured in; equals consumption if refilled to the same level."
+        },
+        "level_ml": {
+          "name": "Level after refill",
+          "description": "Defaults to the tank capacity."
+        }
+      }
+    },
+    "reset_ph_lock": {
+      "name": "Release pH dosing lock",
+      "description": "Releases the lock set by the effect check.",
+      "fields": {
+        "config_entry_id": {
+          "name": "Pool",
+          "description": "The Pool Control entry."
+        }
+      }
+    },
+    "reset_season": {
+      "name": "Reset season counter",
+      "description": "Resets the seasonal dosing counter.",
+      "fields": {
+        "config_entry_id": {
+          "name": "Pool",
+          "description": "The Pool Control entry."
+        }
+      }
+    },
+    "calculate_ph_correction": {
+      "name": "Calculate pH correction",
+      "description": "Returns the amount of pH minus product for a pH correction.",
+      "fields": {
+        "config_entry_id": {
+          "name": "Pool",
+          "description": "The Pool Control entry."
+        },
+        "current_ph": {
+          "name": "Current pH",
+          "description": "Defaults to the measured value."
+        },
+        "target_ph": {
+          "name": "Target pH",
+          "description": "Defaults to the pH set point."
+        }
+      }
+    },
+    "calculate_salt_correction": {
+      "name": "Calculate salt correction",
+      "description": "Returns the amount of salt to add or water to exchange.",
+      "fields": {
+        "config_entry_id": {
+          "name": "Pool",
+          "description": "The Pool Control entry."
+        },
+        "current_ppm": {
+          "name": "Current salt",
+          "description": "Measured salt concentration."
+        },
+        "target_ppm": {
+          "name": "Target salt"
+        }
+      }
+    }
+  }
+}

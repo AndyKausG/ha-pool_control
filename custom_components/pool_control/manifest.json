@@ -1,0 +1,13 @@
+{
+  "domain": "pool_control",
+  "name": "Pool Control",
+  "after_dependencies": ["logbook"],
+  "codeowners": ["@AndyKausG"],
+  "config_flow": true,
+  "documentation": "https://github.com/AndyKausG/ha-pool_control",
+  "integration_type": "device",
+  "iot_class": "calculated",
+  "issue_tracker": "https://github.com/AndyKausG/ha-pool_control/issues",
+  "requirements": [],
+  "version": "1.0.0"
+}

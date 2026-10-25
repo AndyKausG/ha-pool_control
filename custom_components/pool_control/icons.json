@@ -1,0 +1,57 @@
+{
+  "entity": {
+    "sensor": {
+      "status": { "default": "mdi:pool" },
+      "ph": { "default": "mdi:ph" },
+      "orp": { "default": "mdi:flash-triangle-outline" },
+      "orp_target": { "default": "mdi:target" },
+      "measurement_source": { "default": "mdi:source-branch" },
+      "swimming_status": { "default": "mdi:swim" },
+      "filtration_target": { "default": "mdi:timer-cog-outline" },
+      "pump_runtime_today": { "default": "mdi:pump" },
+      "next_filtration": { "default": "mdi:calendar-clock" },
+      "chlorinator_runtime_today": { "default": "mdi:water-plus" },
+      "ph_dosed_today": { "default": "mdi:beaker-minus-outline" },
+      "ph_dosed_season": { "default": "mdi:beaker-minus-outline" },
+      "ph_tank_level": { "default": "mdi:storage-tank-outline" },
+      "ph_tank_level_percent": { "default": "mdi:storage-tank-outline" },
+      "ph_pump_rate": { "default": "mdi:speedometer" },
+      "ph_product_dose_learned": { "default": "mdi:school-outline" }
+    },
+    "binary_sensor": {
+      "swimming_allowed": { "default": "mdi:swim", "state": { "off": "mdi:close-octagon-outline" } },
+      "measurement_valid": { "default": "mdi:check-circle-outline", "state": { "off": "mdi:help-circle-outline" } },
+      "ph_dosing_locked": { "default": "mdi:lock-outline" },
+      "ph_tank_low": { "default": "mdi:storage-tank-outline" }
+    },
+    "button": {
+      "start_boost": { "default": "mdi:play-circle-outline" },
+      "stop_boost": { "default": "mdi:stop-circle-outline" },
+      "ph_tank_refilled": { "default": "mdi:cup-water" },
+      "ph_manual_pulse": { "default": "mdi:needle" },
+      "ph_reset_lock": { "default": "mdi:lock-open-outline" }
+    },
+    "number": {
+      "ph_target": { "default": "mdi:ph" },
+      "chlorine_target": { "default": "mdi:water-check-outline" },
+      "boost_hours": { "default": "mdi:timer-outline" }
+    },
+    "select": {
+      "mode": { "default": "mdi:cog-outline" }
+    },
+    "switch": {
+      "dry_run": { "default": "mdi:test-tube" },
+      "chlorine_control": { "default": "mdi:water-plus" },
+      "ph_control": { "default": "mdi:beaker-minus-outline" }
+    }
+  },
+  "services": {
+    "start_boost": { "service": "mdi:play-circle-outline" },
+    "stop_boost": { "service": "mdi:stop-circle-outline" },
+    "ph_tank_refilled": { "service": "mdi:cup-water" },
+    "reset_ph_lock": { "service": "mdi:lock-open-outline" },
+    "reset_season": { "service": "mdi:counter" },
+    "calculate_ph_correction": { "service": "mdi:calculator" },
+    "calculate_salt_correction": { "service": "mdi:calculator" }
+  }
+}
