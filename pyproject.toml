@@ -1,6 +1,6 @@
 [project]
 name = "ha-pool-control"
-version = "1.0.0b2"
+version = "1.0.0b3"
 description = "Home Assistant integration for pool filtration, chlorination and pH dosing"
 requires-python = ">=3.13"
 license = "MIT"

@@ -7,7 +7,7 @@
  */
 
 const DOMAIN = "pool_control";
-const VERSION = "1.0.0-beta.2";
+const VERSION = "1.0.0-beta.3";
 
 const STRINGS = {
   en: {
@@ -148,8 +148,17 @@ const LOGO = `
     <path d="M178 230 C190 190 214 156 236 128" fill="none" stroke="#fff" stroke-opacity="0.55" stroke-width="16" stroke-linecap="round"/>
   </svg>`;
 
+// Helpers instead of optional chaining, for older tablet browsers.
+function stateOf(state) {
+  return state ? state.state : undefined;
+}
+
+function attrOf(state, key) {
+  return state && state.attributes ? state.attributes[key] : undefined;
+}
+
 function esc(value) {
-  return String(value ?? "").replace(/[&<>"']/g, (c) =>
+  return String(value === null || value === undefined ? "" : value).replace(/[&<>"']/g, (c) =>
     ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]
   );
 }
@@ -184,12 +193,12 @@ class PoolControlCard extends HTMLElement {
   }
 
   _t(key) {
-    const lang = (this._hass?.language || "en").split("-")[0];
+    const lang = ((this._hass && this._hass.language) || "en").split("-")[0];
     return (STRINGS[lang] || STRINGS.en)[key] || STRINGS.en[key] || key;
   }
 
   _code(code) {
-    const lang = (this._hass?.language || "en").split("-")[0];
+    const lang = ((this._hass && this._hass.language) || "en").split("-")[0];
     return (STRINGS[lang] || STRINGS.en).codes[code] || code;
   }
 
@@ -216,7 +225,7 @@ class PoolControlCard extends HTMLElement {
   }
 
   _number(entityId) {
-    const value = parseFloat(this._state(entityId)?.state);
+    const value = parseFloat(stateOf(this._state(entityId)));
     return Number.isFinite(value) ? value : undefined;
   }
 
@@ -226,7 +235,7 @@ class PoolControlCard extends HTMLElement {
 
     const { deviceId, map } = this._entities();
     const status = this._state(map.status);
-    const actuators = status?.attributes?.actuators || {};
+    const actuators = attrOf(status, "actuators") || {};
     const tracked = [...Object.values(map), ...Object.values(actuators)];
     const signature = JSON.stringify([
       deviceId,
@@ -244,13 +253,13 @@ class PoolControlCard extends HTMLElement {
       return;
     }
 
-    const isOn = (key) => this._state(actuators[key])?.state === "on";
-    const device = this._hass.devices?.[deviceId];
-    const title = this._config.title || device?.name_by_user || device?.name || "Pool";
+    const isOn = (key) => stateOf(this._state(actuators[key])) === "on";
+    const device = (this._hass.devices || {})[deviceId];
+    const title = this._config.title || (device && (device.name_by_user || device.name)) || "Pool";
     const mode = this._state(map.mode);
-    const problems = this._state(map.problem)?.attributes?.problems || [];
-    const maintenance = this._state(map.maintenance_due)?.attributes?.tasks || [];
-    const dryRun = this._state(map.dry_run)?.state === "on";
+    const problems = attrOf(this._state(map.problem), "problems") || [];
+    const maintenance = attrOf(this._state(map.maintenance_due), "tasks") || [];
+    const dryRun = stateOf(this._state(map.dry_run)) === "on";
 
     this.shadowRoot.innerHTML = `
       <style>${STYLE}</style>
@@ -285,7 +294,7 @@ class PoolControlCard extends HTMLElement {
     const pump = isOn("pump");
     const chlor = isOn("chlorinator");
     const ph = isOn("ph_pump");
-    const solar = isOn("solar_pump") || this._state(map.solar_heating)?.state === "on";
+    const solar = isOn("solar_pump") || stateOf(this._state(map.solar_heating)) === "on";
     const has = (key) => Boolean(actuators[key]);
     const temp = this._format(map.water_temperature);
     const dev = (key, x, y, label, on, shape) => `
@@ -326,18 +335,18 @@ class PoolControlCard extends HTMLElement {
     const item = (key, name, sub, bad) => {
       if (!map[key]) return "";
       return `<div class="value ${bad ? "bad" : ""}" data-more="${map[key]}">
-        <div class="v ${Number.isFinite(parseFloat(this._state(map[key])?.state)) ? "" : "text"}">${esc(this._format(map[key]))}</div>
+        <div class="v ${Number.isFinite(parseFloat(stateOf(this._state(map[key])))) ? "" : "text"}">${esc(this._format(map[key]))}</div>
         <div class="n">${esc(name)}</div>
         ${sub ? `<div class="s">${esc(sub)}</div>` : ""}
       </div>`;
     };
     const name = (key, fallback) =>
-      this._state(map[key])?.attributes?.friendly_name?.replace(/^.*? /, "") || fallback;
+      (attrOf(this._state(map[key]), "friendly_name") || "").replace(/^.*? /, "") || fallback;
     const ph = this._number(map.ph);
     const phTarget = this._number(map.ph_target);
     const orp = this._number(map.orp);
     const orpTarget = this._number(map.orp_target);
-    const swim = this._state(map.swimming_allowed)?.state;
+    const swim = stateOf(this._state(map.swimming_allowed));
     return `<div class="values">
       ${item("ph", "pH", phTarget !== undefined ? `${this._t("set_point")} ${phTarget}` : "", ph !== undefined && (ph < 6.8 || ph > 8.2))}
       ${item("orp", "ORP", orpTarget !== undefined ? `${this._t("set_point")} ${Math.round(orpTarget)} mV` : "", orp !== undefined && orp < 500)}
@@ -360,7 +369,7 @@ class PoolControlCard extends HTMLElement {
     const tank = this._number(map.ph_tank_level_percent);
     return [
       bar("pump_runtime_today", this._t("runtime"), runtime, target,
-        `${runtime?.toFixed(1) ?? "–"} / ${target?.toFixed(1) ?? "–"} h`, false),
+        `${runtime !== undefined ? runtime.toFixed(1) : "–"} / ${target !== undefined ? target.toFixed(1) : "–"} h`, false),
       bar("ph_tank_level_percent", this._t("tank"), tank, 100,
         `${this._format(map.ph_tank_level)} · ${this._t("dosed")} ${this._format(map.ph_dosed_today)}`,
         tank !== undefined && tank < 15),

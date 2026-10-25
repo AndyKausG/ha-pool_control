@@ -4,6 +4,13 @@ All notable changes to this project are documented in this file. The format
 is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and the
 project uses [Semantic Versioning](https://semver.org/).
 
+## [1.0.0-beta.3] - 2026-10-25
+
+### Fixed
+
+- Dashboard card works on tablets with older browser engines (no optional
+  chaining)
+
 ## [1.0.0-beta.2] - 2026-10-25
 
 ### Fixed
