@@ -511,3 +511,23 @@ async def test_card_registered(hass: HomeAssistant, config_entry: MockConfigEntr
         await _async_register_card(hass)
     hass.http.async_register_static_paths.assert_awaited_once()
     assert add_js.call_args[0][1].startswith("/pool_control/pool-control-card.js?v=")
+
+
+async def test_card_registered_after_frontend(hass: HomeAssistant) -> None:
+    from unittest.mock import AsyncMock, MagicMock, patch
+
+    from homeassistant.const import EVENT_COMPONENT_LOADED
+
+    from custom_components.pool_control import _async_register_card
+
+    hass.http = MagicMock(async_register_static_paths=AsyncMock())
+    if "frontend" in hass.config.components:
+        hass.config.components.remove("frontend")
+    with patch("homeassistant.components.frontend.add_extra_js_url") as add_js:
+        await _async_register_card(hass)
+        hass.http.async_register_static_paths.assert_not_awaited()
+        hass.config.components.add("frontend")
+        hass.bus.async_fire(EVENT_COMPONENT_LOADED, {"component": "frontend"})
+        await hass.async_block_till_done()
+    hass.http.async_register_static_paths.assert_awaited_once()
+    add_js.assert_called_once()

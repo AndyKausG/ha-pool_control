@@ -5,11 +5,12 @@ from __future__ import annotations
 import logging
 from pathlib import Path
 
-from homeassistant.const import Platform
-from homeassistant.core import HomeAssistant
+from homeassistant.const import EVENT_COMPONENT_LOADED, Platform
+from homeassistant.core import Event, HomeAssistant, callback
 from homeassistant.helpers import config_validation as cv
 from homeassistant.helpers.typing import ConfigType
 from homeassistant.loader import async_get_integration
+from homeassistant.setup import ATTR_COMPONENT, EventComponentLoaded
 
 from .const import DOMAIN
 from .coordinator import PoolConfigEntry, PoolCoordinator
@@ -41,8 +42,22 @@ async def async_setup(hass: HomeAssistant, config: ConfigType) -> bool:
 
 
 async def _async_register_card(hass: HomeAssistant) -> None:
-    """Serve the dashboard card and load it in the frontend."""
-    if hass.http is None or "frontend" not in hass.config.components:
+    """Serve the dashboard card and load it in the frontend.
+
+    If the frontend is not loaded yet, registration is deferred until it is.
+    """
+    if hass.http is None:
+        _LOGGER.debug("HTTP not available, dashboard card not registered")
+        return
+    if "frontend" not in hass.config.components:
+
+        @callback
+        def _frontend_loaded(event: Event[EventComponentLoaded]) -> None:
+            if event.data[ATTR_COMPONENT] == "frontend":
+                remove_listener()
+                hass.async_create_task(_async_register_card(hass))
+
+        remove_listener = hass.bus.async_listen(EVENT_COMPONENT_LOADED, _frontend_loaded)
         return
     from homeassistant.components.frontend import add_extra_js_url  # noqa: PLC0415
     from homeassistant.components.http import StaticPathConfig  # noqa: PLC0415
@@ -52,6 +67,7 @@ async def _async_register_card(hass: HomeAssistant) -> None:
     )
     integration = await async_get_integration(hass, DOMAIN)
     add_extra_js_url(hass, f"{CARD_URL}?v={integration.version}")
+    _LOGGER.info("Pool Control dashboard card registered at %s", CARD_URL)
 
 
 async def async_setup_entry(hass: HomeAssistant, entry: PoolConfigEntry) -> bool:
