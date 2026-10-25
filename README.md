@@ -6,6 +6,7 @@
 [![Validate](https://github.com/AndyKausG/ha-pool_control/actions/workflows/validate.yml/badge.svg)](https://github.com/AndyKausG/ha-pool_control/actions/workflows/validate.yml)
 [![HACS Custom](https://img.shields.io/badge/HACS-Custom-41BDF5.svg)](https://hacs.xyz/docs/faq/custom_repositories)
 [![License: MIT](https://img.shields.io/github/license/AndyKausG/ha-pool_control)](LICENSE)
+[![Ko-fi](https://img.shields.io/badge/Ko--fi-Support-FF5E5B?logo=ko-fi&logoColor=white)](https://ko-fi.com/derandyk)
 
 > **Beta:** Version 1.0.0 is a complete rewrite and has not yet been
 > validated on a real pool. Start with *Dry run* enabled and keep hardware
@@ -173,6 +174,11 @@ safeguards independent of Home Assistant: an auto-off timer for the dosing
 pump in the relay and an interlock between pump and chlorinator/dosing pump
 (see [docs/hardware.md](docs/hardware.md)). Use the integration at your own
 risk.
+
+## Support
+
+If Pool Control is useful to you, you can support its development on
+[Ko-fi](https://ko-fi.com/derandyk).
 
 ## License
 
