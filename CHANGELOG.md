@@ -25,6 +25,14 @@ again.
 - Logbook entries, `pool_control_event`, repairs, diagnostics
 - Notification blueprint and Shelly interlock script
 - English and German translations
+- Hourly dosing limit, primary/backup sensor deviation check, Home Assistant
+  watchdog in the Shelly script
+- Manual water tests, Langelier saturation index, shock chlorination,
+  stabilizer warning
+- Maintenance reminders
+- Solar heating (differential control or external signal) and PV surplus
+  filtration
+- Icon, logo and dashboard example
 
 ### Removed
 

@@ -154,6 +154,7 @@ turns problems into notifications.
 - [Control logic](docs/control-logic.md)
 - [Configuration reference](docs/configuration.md)
 - [Hardware example and hardware interlock](docs/hardware.md)
+- [Dashboard example](docs/dashboard.md)
 
 ## Safety notice
 
