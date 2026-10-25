@@ -35,6 +35,7 @@ from .const import (
     OrpTargetMode,
     PhDosingMode,
     Problem,
+    SolarMode,
     Status,
     SwimmingStatus,
 )
@@ -104,7 +105,9 @@ class PoolController:
         decision.filtration_target_h = self.filtration_target_hours()
         self._update_frost(snap.outdoor_temperature)
 
+        self._update_solar(snap, measurement)
         self._decide_pump(snap, decision)
+        self._decide_solar_pump(snap, decision)
         self._decide_chlorinator(snap, decision)
         self._decide_ph(snap, decision)
         self._stop_dosing_before_pump(snap, decision)
@@ -514,6 +517,10 @@ class PoolController:
                 want, reason = self._schedule_wants_pump(snap, decision.filtration_target_h)
                 if not want and self._extension_allowed(snap, decision):
                     want, reason = True, "demand_extension"
+                if not want and self._pv_wants_pump(snap, decision.filtration_target_h):
+                    want, reason = True, "pv_surplus"
+                if not want and self._solar_wants_filter_pump():
+                    want, reason = True, "solar_heating"
             if boost:
                 want, reason = True, "boost"
             if frost:
@@ -539,6 +546,75 @@ class PoolController:
             st.pump_owned = False
             decision.pump = False
             decision.pump_reason = "boost_finished"
+
+    # ------------------------------------------------------------------
+    # Solar heating and PV surplus
+    # ------------------------------------------------------------------
+    def _solar_allowed(self) -> bool:
+        return self.state.operating_mode in CHEMISTRY_MODES and self.state.solar_enabled
+
+    def _update_solar(self, snap: Snapshot, m: Measurement) -> None:
+        """Update the solar heating demand with hysteresis."""
+        s = self.settings
+        st = self.state
+        previous = st.solar_active
+        if s.solar_mode is SolarMode.NONE or not self._solar_allowed():
+            st.solar_active = False
+        elif s.solar_mode is SolarMode.EXTERNAL:
+            st.solar_active = bool(snap.solar_demand_signal)
+        else:
+            water = m.temperature if m.temperature is not None else st.last_valid_temperature
+            collector = snap.solar_collector_temperature
+            if water is None or collector is None:
+                st.solar_active = False
+            elif minutes_between(st.solar_changed, snap.now) < s.solar_min_switch_min:
+                pass
+            elif water >= s.solar_max_temp:
+                st.solar_active = False
+            elif st.solar_active:
+                st.solar_active = collector - water > s.solar_delta_off
+            else:
+                st.solar_active = collector - water >= s.solar_delta_on
+        if st.solar_active != previous:
+            st.solar_changed = snap.now
+
+    def _solar_wants_filter_pump(self) -> bool:
+        return (
+            self.state.solar_active
+            and self.settings.solar_requires_filter
+            and self.state.operating_mode is OperatingMode.AUTO
+        )
+
+    def _decide_solar_pump(self, snap: Snapshot, decision: Decision) -> None:
+        s = self.settings
+        if not s.has_solar_pump:
+            return
+        want = self.state.solar_active
+        reason = "solar_demand" if want else "no_demand"
+        if want and s.solar_requires_filter and not self._flow(snap):
+            want, reason = False, "filter_pump_off"
+        if decision.pump is False and s.solar_requires_filter:
+            want, reason = False, "filter_pump_stopping"
+        if want != snap.solar_pump_on:
+            decision.solar_pump, decision.solar_reason = want, reason
+
+    def _pv_wants_pump(self, snap: Snapshot, target_h: float) -> bool:
+        """Run the pump early while PV surplus is available."""
+        s = self.settings
+        st = self.state
+        now = snap.now
+        if not s.has_pv:
+            return False
+        start, end = self._window(now)
+        if not start <= now < end or st.pump_runtime_today_s >= target_h * 3600:
+            return False
+        if st.pv_run_until is not None and now < st.pv_run_until and snap.pump_on:
+            return True
+        if snap.pv_surplus:
+            if not snap.pump_on:
+                st.pv_run_until = now + timedelta(minutes=s.pv_min_run_min)
+            return True
+        return False
 
     def _stop_dosing_before_pump(self, snap: Snapshot, decision: Decision) -> None:
         """Switch off chlorinator and dosing pump one step before the pump.

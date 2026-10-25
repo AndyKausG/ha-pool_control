@@ -829,6 +829,92 @@ def test_cell_cleaning_requires_chlorinator() -> None:
     assert MaintenanceTask.CELL_CLEANING not in settings.maintenance_days
 
 
+SOLAR_OPTIONS = {"solar_pump": "switch.solar", "solar_collector_sensor": "sensor.collector"}
+
+
+def test_solar_differential_control() -> None:
+    controller = make_controller(running(), **SOLAR_OPTIONS)
+    decision = controller.step(snap(temp=24, solar_collector_temperature=31))
+    assert controller.state.solar_active
+    assert decision.solar_pump is True
+    # Within the minimum switching interval nothing changes.
+    later = NOON + timedelta(minutes=5)
+    controller.step(snap(later, temp=24, solar_pump_on=True, solar_collector_temperature=26))
+    assert controller.state.solar_active
+    later = NOON + timedelta(minutes=15)
+    decision = controller.step(
+        snap(later, temp=24, solar_pump_on=True, solar_collector_temperature=26)
+    )
+    assert not controller.state.solar_active
+    assert decision.solar_pump is False
+
+
+def test_solar_respects_max_temperature_and_hysteresis() -> None:
+    controller = make_controller(running(), **SOLAR_OPTIONS)
+    controller.step(snap(temp=30.5, solar_collector_temperature=45))
+    assert not controller.state.solar_active
+    controller.step(snap(temp=24, solar_collector_temperature=29))
+    assert not controller.state.solar_active
+
+
+def test_solar_starts_filter_pump_outside_schedule() -> None:
+    now = datetime(2026, 7, 1, 12, 5, tzinfo=TZ)
+    state = RuntimeState(
+        temp_mean_yesterday=16.0,
+        pump_runtime_today_s=4 * 3600,
+        day=now.date().isoformat(),
+        last_valid_temperature=24,
+    )
+    controller = make_controller(state, **SOLAR_OPTIONS)
+    decision = controller.step(snap(now, pump=False, solar_collector_temperature=35))
+    assert decision.pump is True
+    assert decision.pump_reason == "solar_heating"
+    # The solar pump waits for the filter pump.
+    assert decision.solar_pump is None
+
+
+def test_solar_external_signal() -> None:
+    controller = make_controller(
+        running(), solar_pump="switch.solar", solar_demand_sensor="binary_sensor.x"
+    )
+    assert controller.step(snap(solar_demand_signal=True)).solar_pump is True
+    assert controller.step(snap(solar_demand_signal=False, solar_pump_on=True)).solar_pump is False
+
+
+def test_solar_disabled_by_switch_and_mode() -> None:
+    controller = make_controller(running(solar_enabled=False), **SOLAR_OPTIONS)
+    controller.step(snap(temp=24, solar_collector_temperature=40))
+    assert not controller.state.solar_active
+    controller = make_controller(running(mode="winter"), **SOLAR_OPTIONS)
+    controller.step(snap(temp=24, solar_collector_temperature=40))
+    assert not controller.state.solar_active
+
+
+def test_pv_surplus_runs_pump_early() -> None:
+    now = datetime(2026, 7, 1, 12, 5, tzinfo=TZ)
+    state = RuntimeState(
+        temp_mean_yesterday=16.0, pump_runtime_today_s=4 * 3600, day=now.date().isoformat()
+    )
+    controller = make_controller(state, pv_surplus_sensor="binary_sensor.pv")
+    decision = controller.step(snap(now, pump=False, pv_surplus=True))
+    assert decision.pump is True
+    assert decision.pump_reason == "pv_surplus"
+    # Minimum run time keeps the pump running after the surplus is gone.
+    decision = controller.step(snap(now + timedelta(minutes=10), pv_surplus=False))
+    assert decision.pump is True
+    decision = controller.step(snap(now + timedelta(minutes=40), pv_surplus=False))
+    assert decision.pump is False
+
+
+def test_pv_surplus_not_beyond_daily_target() -> None:
+    now = datetime(2026, 7, 1, 12, 5, tzinfo=TZ)
+    state = RuntimeState(
+        temp_mean_yesterday=16.0, pump_runtime_today_s=8 * 3600, day=now.date().isoformat()
+    )
+    controller = make_controller(state, pv_surplus_sensor="binary_sensor.pv")
+    assert controller.step(snap(now, pump=False, pv_surplus=True)).pump is False
+
+
 def test_state_roundtrip() -> None:
     state = running(ph_lockout_until=NOON, tank_level_ml=100.0)
     restored = RuntimeState.from_dict({**state.to_dict(), "unknown": 1})

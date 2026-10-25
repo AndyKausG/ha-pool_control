@@ -15,7 +15,7 @@ from homeassistant.const import EntityCategory
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddConfigEntryEntitiesCallback
 
-from .const import Problem, SwimmingStatus
+from .const import Problem, SolarMode, SwimmingStatus
 from .coordinator import PoolConfigEntry, PoolCoordinator
 from .entity import PoolEntity
 
@@ -27,6 +27,7 @@ class PoolBinarySensorDescription(BinarySensorEntityDescription):
     is_on_fn: Callable[[PoolCoordinator], bool]
     attrs_fn: Callable[[PoolCoordinator], dict[str, Any]] | None = None
     requires_ph_pump: bool = False
+    requires_solar: bool = False
 
 
 BINARY_SENSORS: tuple[PoolBinarySensorDescription, ...] = (
@@ -35,6 +36,12 @@ BINARY_SENSORS: tuple[PoolBinarySensorDescription, ...] = (
         device_class=BinarySensorDeviceClass.PROBLEM,
         is_on_fn=lambda c: bool(c.data.problems),
         attrs_fn=lambda c: {"problems": sorted(p.value for p in c.data.problems)},
+    ),
+    PoolBinarySensorDescription(
+        key="solar_heating",
+        device_class=BinarySensorDeviceClass.HEAT,
+        is_on_fn=lambda c: c.state.solar_active,
+        requires_solar=True,
     ),
     PoolBinarySensorDescription(
         key="maintenance_due",
@@ -81,7 +88,10 @@ async def async_setup_entry(
     async_add_entities(
         PoolBinarySensor(coordinator, description)
         for description in BINARY_SENSORS
-        if coordinator.settings.has_ph_pump or not description.requires_ph_pump
+        if (coordinator.settings.has_ph_pump or not description.requires_ph_pump)
+        and (
+            coordinator.settings.solar_mode is not SolarMode.NONE or not description.requires_solar
+        )
     )
 
 

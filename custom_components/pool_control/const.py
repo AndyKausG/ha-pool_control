@@ -28,6 +28,10 @@ CONF_WEATHER: Final = "weather"
 CONF_OUTDOOR_TEMP_SENSOR: Final = "outdoor_temperature_sensor"
 CONF_FLOW_SENSOR: Final = "flow_sensor"
 CONF_PUMP_POWER_SENSOR: Final = "pump_power_sensor"
+CONF_SOLAR_PUMP: Final = "solar_pump"
+CONF_SOLAR_COLLECTOR_SENSOR: Final = "solar_collector_sensor"
+CONF_SOLAR_DEMAND_SENSOR: Final = "solar_demand_sensor"
+CONF_PV_SURPLUS_SENSOR: Final = "pv_surplus_sensor"
 
 # --- Config keys: pool ------------------------------------------------------
 CONF_VOLUME: Final = "volume"
@@ -87,6 +91,15 @@ CONF_SWIM_ORP_MIN: Final = "swim_orp_min"
 CONF_SWIM_DATA_MAX_AGE: Final = "swim_data_max_age_hours"
 
 
+# --- Config keys: solar and PV ----------------------------------------------
+CONF_SOLAR_DELTA_ON: Final = "solar_delta_on"
+CONF_SOLAR_DELTA_OFF: Final = "solar_delta_off"
+CONF_SOLAR_MAX_TEMP: Final = "solar_max_water_temperature"
+CONF_SOLAR_MIN_SWITCH: Final = "solar_min_switch_minutes"
+CONF_SOLAR_NEEDS_FILTER: Final = "solar_requires_filter_pump"
+CONF_PV_MIN_SURPLUS: Final = "pv_min_surplus"
+CONF_PV_MIN_RUN: Final = "pv_min_run_minutes"
+
 # --- Config keys: maintenance ----------------------------------------------
 CONF_MAINT_PH_CAL: Final = "maintenance_ph_calibration_days"
 CONF_MAINT_ORP_CAL: Final = "maintenance_orp_calibration_days"
@@ -109,6 +122,14 @@ MAINTENANCE_OPTIONS: Final = {
     MaintenanceTask.BACKWASH: CONF_MAINT_BACKWASH,
     MaintenanceTask.CELL_CLEANING: CONF_MAINT_CELL,
 }
+
+
+class SolarMode(StrEnum):
+    """How solar heating is controlled."""
+
+    NONE = "none"
+    DIFFERENTIAL = "differential"
+    EXTERNAL = "external"
 
 
 class OperatingMode(StrEnum):
@@ -271,6 +292,14 @@ DEFAULTS: Final[dict[str, object]] = {
     CONF_SWIM_PH_MAX: 7.8,
     CONF_SWIM_ORP_MIN: 650,
     CONF_SWIM_DATA_MAX_AGE: 6,
+    # Solar and PV
+    CONF_SOLAR_DELTA_ON: 6.0,
+    CONF_SOLAR_DELTA_OFF: 3.0,
+    CONF_SOLAR_MAX_TEMP: 30.0,
+    CONF_SOLAR_MIN_SWITCH: 10,
+    CONF_SOLAR_NEEDS_FILTER: True,
+    CONF_PV_MIN_SURPLUS: 300,
+    CONF_PV_MIN_RUN: 30,
     # Maintenance intervals in days, 0 disables the reminder
     CONF_MAINT_PH_CAL: 90,
     CONF_MAINT_ORP_CAL: 90,

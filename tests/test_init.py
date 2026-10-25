@@ -451,6 +451,32 @@ async def test_flow_sensor_interlock(hass: HomeAssistant, freezer: FrozenDateTim
     assert _state(hass, "binary_sensor.pool_problem") == "on"
 
 
+async def test_solar_and_pv(hass: HomeAssistant, freezer: FrozenDateTimeFactory) -> None:
+    await setup_inputs(hass)
+    hass.states.async_set("input_boolean.solar", "off")
+    hass.states.async_set("sensor.collector", "40", {"unit_of_measurement": "°C"})
+    hass.states.async_set("sensor.pv", "1000", {"unit_of_measurement": "W"})
+    entry = MockConfigEntry(
+        domain=DOMAIN,
+        title="Pool",
+        version=3,
+        options={
+            **OPTIONS,
+            "solar_pump": "input_boolean.solar",
+            "solar_collector_sensor": "sensor.collector",
+            "pv_surplus_sensor": "sensor.pv",
+        },
+    )
+    entry.add_to_hass(hass)
+    assert await hass.config_entries.async_setup(entry.entry_id)
+    await hass.async_block_till_done()
+    coordinator = entry.runtime_data
+    assert coordinator.snapshot().pv_surplus is True
+    assert coordinator.snapshot().solar_collector_temperature == 40
+    assert hass.states.get("binary_sensor.pool_solar_heating") is not None
+    assert hass.states.get("switch.pool_solar_control") is not None
+
+
 async def test_diagnostics(hass: HomeAssistant, loaded_entry: MockConfigEntry, hass_client) -> None:
     result = await get_diagnostics_for_config_entry(hass, hass_client, loaded_entry)
     assert result["options"]["pump"] == "input_boolean.pump"

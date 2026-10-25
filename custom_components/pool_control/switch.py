@@ -10,6 +10,7 @@ from homeassistant.const import EntityCategory
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddConfigEntryEntitiesCallback
 
+from .const import SolarMode
 from .coordinator import PoolConfigEntry, PoolCoordinator
 from .entity import PoolEntity
 
@@ -21,6 +22,7 @@ class PoolSwitchDescription(SwitchEntityDescription):
     attribute: str
     requires_chlorinator: bool = False
     requires_ph_pump: bool = False
+    requires_solar: bool = False
 
 
 SWITCHES: tuple[PoolSwitchDescription, ...] = (
@@ -34,6 +36,12 @@ SWITCHES: tuple[PoolSwitchDescription, ...] = (
         attribute="chlorine_control_enabled",
         entity_category=EntityCategory.CONFIG,
         requires_chlorinator=True,
+    ),
+    PoolSwitchDescription(
+        key="solar_control",
+        attribute="solar_enabled",
+        entity_category=EntityCategory.CONFIG,
+        requires_solar=True,
     ),
     PoolSwitchDescription(
         key="ph_control",
@@ -57,6 +65,7 @@ async def async_setup_entry(
         for description in SWITCHES
         if (settings.has_chlorinator or not description.requires_chlorinator)
         and (settings.has_ph_pump or not description.requires_ph_pump)
+        and (settings.solar_mode is not SolarMode.NONE or not description.requires_solar)
     )
 
 

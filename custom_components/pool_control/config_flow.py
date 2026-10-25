@@ -51,12 +51,23 @@ from .const import (
     CONF_PUMP,
     CONF_PUMP_MIN_POWER,
     CONF_PUMP_POWER_SENSOR,
+    CONF_PV_MIN_RUN,
+    CONF_PV_MIN_SURPLUS,
+    CONF_PV_SURPLUS_SENSOR,
     CONF_RUNTIME_DIVISOR,
     CONF_RUNTIME_MAX,
     CONF_RUNTIME_MIN,
     CONF_SALT_MAX,
     CONF_SALT_MIN,
     CONF_SALT_SENSOR,
+    CONF_SOLAR_COLLECTOR_SENSOR,
+    CONF_SOLAR_DELTA_OFF,
+    CONF_SOLAR_DELTA_ON,
+    CONF_SOLAR_DEMAND_SENSOR,
+    CONF_SOLAR_MAX_TEMP,
+    CONF_SOLAR_MIN_SWITCH,
+    CONF_SOLAR_NEEDS_FILTER,
+    CONF_SOLAR_PUMP,
     CONF_STABILIZATION,
     CONF_STUCK_MINUTES,
     CONF_SWIM_DATA_MAX_AGE,
@@ -133,6 +144,10 @@ SENSOR_FIELDS: list[tuple[str, Any, bool]] = [
     (CONF_OUTDOOR_TEMP_SENSOR, _entity(["sensor"], "temperature"), False),
     (CONF_FLOW_SENSOR, _entity(["binary_sensor"]), False),
     (CONF_PUMP_POWER_SENSOR, _entity(["sensor"], "power"), False),
+    (CONF_SOLAR_PUMP, _entity(SWITCH_DOMAINS), False),
+    (CONF_SOLAR_COLLECTOR_SENSOR, _entity(["sensor"], "temperature"), False),
+    (CONF_SOLAR_DEMAND_SENSOR, _entity(["binary_sensor", "switch", "input_boolean"]), False),
+    (CONF_PV_SURPLUS_SENSOR, _entity(["binary_sensor", "sensor"]), False),
 ]
 ENTITY_KEYS = [key for key, _, _ in ACTUATOR_FIELDS + SENSOR_FIELDS]
 
@@ -192,6 +207,16 @@ FROST_SWIM_FIELDS: list[tuple[str, Any, bool]] = [
     (CONF_SWIM_DATA_MAX_AGE, _number(1, 72, 1, HOURS), True),
 ]
 
+SOLAR_PV_FIELDS: list[tuple[str, Any, bool]] = [
+    (CONF_SOLAR_DELTA_ON, _number(1, 30, 0.5, "K"), True),
+    (CONF_SOLAR_DELTA_OFF, _number(0, 20, 0.5, "K"), True),
+    (CONF_SOLAR_MAX_TEMP, _number(15, 40, 0.5, "°C"), True),
+    (CONF_SOLAR_MIN_SWITCH, _number(0, 120, 1, MINUTES), True),
+    (CONF_SOLAR_NEEDS_FILTER, BOOLEAN, True),
+    (CONF_PV_MIN_SURPLUS, _number(0, 10000, 10, "W"), True),
+    (CONF_PV_MIN_RUN, _number(0, 240, 5, MINUTES), True),
+]
+
 MAINTENANCE_FIELDS: list[tuple[str, Any, bool]] = [
     (key, _number(0, 365, 1, UnitOfTime.DAYS), True) for key in MAINTENANCE_OPTIONS.values()
 ]
@@ -203,6 +228,7 @@ OPTION_STEPS: dict[str, list[tuple[str, Any, bool]]] = {
     "chlorine": CHLORINE_FIELDS,
     "ph_dosing": PH_FIELDS,
     "frost_swimming": FROST_SWIM_FIELDS,
+    "solar_pv": SOLAR_PV_FIELDS,
     "maintenance": MAINTENANCE_FIELDS,
 }
 
@@ -238,11 +264,16 @@ def _validate(options: dict[str, Any]) -> dict[str, str]:
     auto_off = float(merged[CONF_PH_PUMP_AUTO_OFF])
     if auto_off > 0 and float(merged[CONF_PH_PULSE]) > auto_off - PH_PULSE_MARGIN_SECONDS:
         errors[CONF_PH_PULSE] = "pulse_exceeds_auto_off"
+    if float(merged[CONF_SOLAR_DELTA_OFF]) >= float(merged[CONF_SOLAR_DELTA_ON]):
+        errors[CONF_SOLAR_DELTA_OFF] = "solar_delta_invalid"
+    if merged.get(CONF_SOLAR_COLLECTOR_SENSOR) and merged.get(CONF_SOLAR_DEMAND_SENSOR):
+        errors["base"] = "solar_source_conflict"
     if float(merged[CONF_SALT_MIN]) >= float(merged[CONF_SALT_MAX]):
         errors[CONF_SALT_MAX] = "salt_invalid"
     if float(merged[CONF_SWIM_PH_MIN]) >= float(merged[CONF_SWIM_PH_MAX]):
         errors[CONF_SWIM_PH_MAX] = "swim_ph_invalid"
-    actuators = [merged.get(key) for key, _, _ in ACTUATOR_FIELDS if merged.get(key)]
+    actuator_keys = [key for key, _, _ in ACTUATOR_FIELDS] + [CONF_SOLAR_PUMP]
+    actuators = [merged[key] for key in actuator_keys if merged.get(key)]
     if len(actuators) != len(set(actuators)):
         errors["base"] = "duplicate_actuator"
     return errors
@@ -343,6 +374,12 @@ class PoolControlOptionsFlow(OptionsFlow):
     ) -> ConfigFlowResult:
         """Edit pH dosing settings."""
         return await self._async_step("ph_dosing", user_input)
+
+    async def async_step_solar_pv(
+        self, user_input: dict[str, Any] | None = None
+    ) -> ConfigFlowResult:
+        """Edit solar heating and PV surplus settings."""
+        return await self._async_step("solar_pv", user_input)
 
     async def async_step_maintenance(
         self, user_input: dict[str, Any] | None = None

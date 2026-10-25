@@ -150,6 +150,11 @@ async def test_options_remove_optional_entity(hass: HomeAssistant) -> None:
         ),
         ("measurement", {"stabilization_minutes": 20}, None),
         ("maintenance", {"maintenance_backwash_days": 7}, None),
+        (
+            "solar_pv",
+            {"solar_delta_on": 3, "solar_delta_off": 4},
+            {"solar_delta_off": "solar_delta_invalid"},
+        ),
     ],
 )
 async def test_options_steps(

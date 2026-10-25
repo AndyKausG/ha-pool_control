@@ -19,6 +19,10 @@ All parameters are changed in Settings > Devices & services > Pool Control >
 | Outdoor temperature sensor | no | Takes precedence over the weather entity |
 | Flow sensor | no | `binary_sensor`, on while water flows |
 | Pump power sensor | no | Flow indicator if no flow sensor exists |
+| Solar pump | no | Pump or valve of the solar absorber |
+| Solar collector temperature | no | Enables differential control |
+| Solar demand signal | no | Switching output of an existing solar controller |
+| PV surplus | no | Binary sensor or power sensor (W) |
 
 ## Filtration
 
@@ -83,6 +87,17 @@ All parameters are changed in Settings > Devices & services > Pool Control >
 | Swimming pH range | 7.0-7.8 | |
 | Swimming minimum ORP | 650 mV | |
 | Swimming maximum data age | 6 h | |
+
+## Solar heating and PV surplus
+
+| Option | Default | Description |
+|---|---|---|
+| Switch-on / switch-off difference | 6 K / 3 K | Collector minus water temperature |
+| Maximum water temperature | 30 °C | |
+| Minimum switching interval | 10 min | |
+| Solar requires filter pump | on | Absorber in the filter circuit |
+| Minimum PV surplus | 300 W | Power sensor only |
+| Minimum PV run time | 30 min | |
 
 ## Maintenance
 

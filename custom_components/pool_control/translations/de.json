@@ -33,7 +33,11 @@
           "weather": "Wetter",
           "outdoor_temperature_sensor": "Außentemperatur-Sensor",
           "flow_sensor": "Durchflusssensor",
-          "pump_power_sensor": "Pumpenleistung"
+          "pump_power_sensor": "Pumpenleistung",
+          "solar_pump": "Solarpumpe",
+          "solar_collector_sensor": "Kollektortemperatur",
+          "solar_demand_sensor": "Solar-Anforderungssignal",
+          "pv_surplus_sensor": "PV-Überschuss"
         },
         "data_description": {
           "ph_sensor": "Primärer pH-Sensor in der Durchflusszelle.",
@@ -46,7 +50,11 @@
           "weather": "Wetter-Entität für die Außentemperatur (optional).",
           "outdoor_temperature_sensor": "Hat Vorrang vor der Wetter-Entität (optional).",
           "flow_sensor": "Binärsensor, der bei Durchfluss an ist (optional).",
-          "pump_power_sensor": "Leistung der Filterpumpe als Durchflussindikator (optional)."
+          "pump_power_sensor": "Leistung der Filterpumpe als Durchflussindikator (optional).",
+          "solar_pump": "Pumpe oder Ventil des Solarabsorbers (optional).",
+          "solar_collector_sensor": "Aktiviert die Differenzregelung (optional).",
+          "solar_demand_sensor": "Schaltausgang einer vorhandenen Solarsteuerung (optional).",
+          "pv_surplus_sensor": "Binärsensor oder Leistungssensor in W (optional)."
         }
       }
     },
@@ -56,6 +64,8 @@
       "pulse_exceeds_auto_off": "Der Puls muss mindestens 5 s kürzer als das Hardware-Auto-Off sein.",
       "salt_invalid": "Das Maximum muss größer als das Minimum sein.",
       "swim_ph_invalid": "Das Maximum muss größer als das Minimum sein.",
+      "solar_delta_invalid": "Die Ausschaltdifferenz muss kleiner als die Einschaltdifferenz sein.",
+      "solar_source_conflict": "Entweder Kollektortemperatur oder Anforderungssignal verwenden, nicht beides.",
       "duplicate_actuator": "Jeder Aktor benötigt einen eigenen Schalter."
     }
   },
@@ -70,6 +80,7 @@
           "chlorine": "Chlorierung",
           "ph_dosing": "pH-Dosierung",
           "frost_swimming": "Frostschutz und Baden",
+          "solar_pv": "Solarheizung und PV-Überschuss",
           "maintenance": "Wartung"
         }
       },
@@ -89,7 +100,11 @@
           "weather": "Wetter",
           "outdoor_temperature_sensor": "Außentemperatur-Sensor",
           "flow_sensor": "Durchflusssensor",
-          "pump_power_sensor": "Pumpenleistung"
+          "pump_power_sensor": "Pumpenleistung",
+          "solar_pump": "Solarpumpe",
+          "solar_collector_sensor": "Kollektortemperatur",
+          "solar_demand_sensor": "Solar-Anforderungssignal",
+          "pv_surplus_sensor": "PV-Überschuss"
         },
         "data_description": {
           "pump": "Schalter der Filterpumpe.",
@@ -105,7 +120,11 @@
           "weather": "Wetter-Entität für die Außentemperatur (optional).",
           "outdoor_temperature_sensor": "Hat Vorrang vor der Wetter-Entität (optional).",
           "flow_sensor": "Binärsensor, der bei Durchfluss an ist (optional).",
-          "pump_power_sensor": "Leistung der Filterpumpe als Durchflussindikator (optional)."
+          "pump_power_sensor": "Leistung der Filterpumpe als Durchflussindikator (optional).",
+          "solar_pump": "Pumpe oder Ventil des Solarabsorbers (optional).",
+          "solar_collector_sensor": "Aktiviert die Differenzregelung (optional).",
+          "solar_demand_sensor": "Schaltausgang einer vorhandenen Solarsteuerung (optional).",
+          "pv_surplus_sensor": "Binärsensor oder Leistungssensor in W (optional)."
         }
       },
       "filtration": {
@@ -219,6 +238,25 @@
           "swim_data_max_age_hours": "Ältere Messwerte werden nicht bewertet."
         }
       },
+      "solar_pv": {
+        "title": "Solarheizung und PV-Überschuss",
+        "data": {
+          "solar_delta_on": "Einschaltdifferenz",
+          "solar_delta_off": "Ausschaltdifferenz",
+          "solar_max_water_temperature": "Maximale Wassertemperatur",
+          "solar_min_switch_minutes": "Minimaler Schaltabstand",
+          "solar_requires_filter_pump": "Solar benötigt Filterpumpe",
+          "pv_min_surplus": "Minimaler PV-Überschuss",
+          "pv_min_run_minutes": "Minimale PV-Laufzeit"
+        },
+        "data_description": {
+          "solar_delta_on": "Kollektor- minus Wassertemperatur für den Start der Solarheizung.",
+          "solar_max_water_temperature": "Oberhalb keine Solarheizung.",
+          "solar_requires_filter_pump": "Der Absorber liegt im Filterkreislauf.",
+          "pv_min_surplus": "Nur bei einem Leistungssensor.",
+          "pv_min_run_minutes": "Mindestlaufzeit eines durch Überschuss gestarteten Laufs."
+        }
+      },
       "maintenance": {
         "title": "Wartung",
         "description": "Erinnerungsintervalle in Tagen.",
@@ -242,6 +280,8 @@
       "pulse_exceeds_auto_off": "Der Puls muss mindestens 5 s kürzer als das Hardware-Auto-Off sein.",
       "salt_invalid": "Das Maximum muss größer als das Minimum sein.",
       "swim_ph_invalid": "Das Maximum muss größer als das Minimum sein.",
+      "solar_delta_invalid": "Die Ausschaltdifferenz muss kleiner als die Einschaltdifferenz sein.",
+      "solar_source_conflict": "Entweder Kollektortemperatur oder Anforderungssignal verwenden, nicht beides.",
       "duplicate_actuator": "Jeder Aktor benötigt einen eigenen Schalter."
     }
   },
@@ -366,6 +406,9 @@
       "problem": {
         "name": "Problem"
       },
+      "solar_heating": {
+        "name": "Solarheizung"
+      },
       "maintenance_due": {
         "name": "Wartung fällig"
       },
@@ -461,6 +504,9 @@
     "switch": {
       "dry_run": {
         "name": "Nur simulieren"
+      },
+      "solar_control": {
+        "name": "Solarregelung"
       },
       "chlorine_control": {
         "name": "Chlorregelung"

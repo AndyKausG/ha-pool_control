@@ -31,6 +31,9 @@ the pH minus dosing pump.
   cleaning.
 - **Tank tracking** - Fill level, daily and seasonal consumption. Refills
   calibrate the real pump rate.
+- **Solar heating** - Differential control of a solar absorber or use of the
+  switching signal of an existing solar controller.
+- **PV surplus** - Pulls the filtration forward while PV surplus is available.
 - **Frost protection** - Runs the pump when the outdoor temperature drops
   below a threshold, in every mode except *Off*.
 - **Safety** - Chlorinator and dosing pump never run without the filter pump.
@@ -49,7 +52,8 @@ the pH minus dosing pump.
 - pH, ORP and water temperature sensors in the circulation (flow cell)
 - Optional: chlorinator switch, pH minus dosing pump switch, backup sensors,
   salt sensor, weather entity or outdoor temperature sensor, flow sensor or
-  pump power sensor
+  pump power sensor, solar pump and collector sensor or solar demand signal,
+  PV surplus sensor
 
 ## Installation
 
@@ -103,6 +107,8 @@ before switching over.
 | `binary_sensor.<pool>_swimming_allowed` | On if swimming is recommended |
 | `binary_sensor.<pool>_problem` | On if any problem is active; attribute `problems` |
 | `binary_sensor.<pool>_frost_protection` | Frost protection active |
+| `binary_sensor.<pool>_solar_heating` | Solar heating demand |
+| `switch.<pool>_solar_control` | Enable or disable solar heating |
 | `binary_sensor.<pool>_maintenance_due` | A maintenance task is due; attribute `tasks` |
 | `sensor.<pool>_next_backwash`, `_next_ph_calibration`, ... | Next due date per task |
 | `button.<pool>_backwash_done`, ... | Mark a task as done |

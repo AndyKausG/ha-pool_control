@@ -25,6 +25,7 @@
       "free_chlorine_test": { "default": "mdi:test-tube" }
     },
     "binary_sensor": {
+      "solar_heating": { "default": "mdi:solar-power-variant" },
       "maintenance_due": { "default": "mdi:wrench-check-outline", "state": { "on": "mdi:wrench-clock" } },
       "swimming_allowed": { "default": "mdi:swim", "state": { "off": "mdi:close-octagon-outline" } },
       "measurement_valid": { "default": "mdi:check-circle-outline", "state": { "off": "mdi:help-circle-outline" } },
@@ -60,7 +61,8 @@
     "switch": {
       "dry_run": { "default": "mdi:test-tube" },
       "chlorine_control": { "default": "mdi:water-plus" },
-      "ph_control": { "default": "mdi:beaker-minus-outline" }
+      "ph_control": { "default": "mdi:beaker-minus-outline" },
+      "solar_control": { "default": "mdi:solar-power-variant" }
     }
   },
   "services": {

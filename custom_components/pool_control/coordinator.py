@@ -47,7 +47,12 @@ from .const import (
     CONF_PUMP,
     CONF_PUMP_MIN_POWER,
     CONF_PUMP_POWER_SENSOR,
+    CONF_PV_MIN_SURPLUS,
+    CONF_PV_SURPLUS_SENSOR,
     CONF_SALT_SENSOR,
+    CONF_SOLAR_COLLECTOR_SENSOR,
+    CONF_SOLAR_DEMAND_SENSOR,
+    CONF_SOLAR_PUMP,
     CONF_TEMP_SENSOR,
     CONF_WEATHER,
     DEFAULTS,
@@ -71,6 +76,9 @@ type PoolConfigEntry = ConfigEntry[PoolCoordinator]
 SAVE_DELAY_SECONDS = 10
 
 INPUT_KEYS = (
+    CONF_SOLAR_COLLECTOR_SENSOR,
+    CONF_SOLAR_DEMAND_SENSOR,
+    CONF_PV_SURPLUS_SENSOR,
     CONF_PH_SENSOR,
     CONF_ORP_SENSOR,
     CONF_TEMP_SENSOR,
@@ -158,7 +166,9 @@ class PoolCoordinator(DataUpdateCoordinator[Decision]):
                 async_track_state_change_event(self.hass, inputs + flow, self._on_input_change)
             )
         actuators = [
-            eid for key in (CONF_PUMP, CONF_CHLORINATOR, CONF_PH_PUMP) if (eid := self.entity(key))
+            eid
+            for key in (CONF_PUMP, CONF_CHLORINATOR, CONF_PH_PUMP, CONF_SOLAR_PUMP)
+            if (eid := self.entity(key))
         ]
         self._unsubs.append(
             async_track_state_change_event(self.hass, actuators, self._on_actuator_change)
@@ -256,7 +266,41 @@ class PoolCoordinator(DataUpdateCoordinator[Decision]):
                 self.entity(CONF_OUTDOOR_TEMP_SENSOR) or self.entity(CONF_WEATHER)
             ),
             flow_ok=self._flow_ok(),
+            solar_pump_on=self._is_on(CONF_SOLAR_PUMP),
+            solar_collector_temperature=self._reading(
+                CONF_SOLAR_COLLECTOR_SENSOR, temperature=True
+            ).value,
+            solar_demand_signal=self._binary(CONF_SOLAR_DEMAND_SENSOR),
+            pv_surplus=self._pv_surplus(),
         )
+
+    def _binary(self, key: str) -> bool | None:
+        entity_id = self.entity(key)
+        if entity_id is None:
+            return None
+        state = self.hass.states.get(entity_id)
+        if state is None or state.state in (STATE_UNAVAILABLE, STATE_UNKNOWN):
+            return None
+        return state.state == STATE_ON
+
+    def _pv_surplus(self) -> bool | None:
+        """Return whether PV surplus covers the pump.
+
+        A binary sensor is used as is. A power sensor (W) counts the pump's own
+        consumption back in while the pump runs, so the pump does not switch
+        itself off by reducing the surplus.
+        """
+        entity_id = self.entity(CONF_PV_SURPLUS_SENSOR)
+        if entity_id is None:
+            return None
+        if entity_id.startswith("binary_sensor."):
+            return self._binary(CONF_PV_SURPLUS_SENSOR)
+        surplus = _float_state(self.hass.states.get(entity_id))
+        if surplus is None:
+            return None
+        if self._is_on(CONF_PUMP) and (power_id := self.entity(CONF_PUMP_POWER_SENSOR)):
+            surplus += _float_state(self.hass.states.get(power_id)) or 0.0
+        return surplus >= float(self.options[CONF_PV_MIN_SURPLUS])
 
     # ------------------------------------------------------------------
     # Event handlers
@@ -285,7 +329,10 @@ class PoolCoordinator(DataUpdateCoordinator[Decision]):
             self._track_ph_pump(is_on, dt_util.as_local(changed))
 
         pump_running = self._is_on(CONF_PUMP)
-        if not pump_running and (self._is_on(CONF_CHLORINATOR) or self._is_on(CONF_PH_PUMP)):
+        solar_dependent = self.settings.solar_requires_filter and self._is_on(CONF_SOLAR_PUMP)
+        if not pump_running and (
+            self._is_on(CONF_CHLORINATOR) or self._is_on(CONF_PH_PUMP) or solar_dependent
+        ):
             self.hass.async_create_task(self._enforce_interlock("pump_off"))
         self.hass.async_create_task(self.async_request_refresh())
 
@@ -312,7 +359,10 @@ class PoolCoordinator(DataUpdateCoordinator[Decision]):
 
     async def _enforce_interlock(self, reason: str) -> None:
         """Switch off chlorinator and dosing pump. Always active."""
-        for key in (CONF_CHLORINATOR, CONF_PH_PUMP):
+        keys = [CONF_CHLORINATOR, CONF_PH_PUMP]
+        if self.settings.solar_requires_filter:
+            keys.append(CONF_SOLAR_PUMP)
+        for key in keys:
             if self._is_on(key):
                 await self._switch(key, False)
                 self._log(f"{key} switched off by interlock ({reason})")
@@ -351,6 +401,9 @@ class PoolCoordinator(DataUpdateCoordinator[Decision]):
 
         if decision.chlorinator is True and not snap_chlor:
             await self._apply(CONF_CHLORINATOR, True, decision.chlorinator_reason, dry_run)
+
+        if decision.solar_pump is not None:
+            await self._apply(CONF_SOLAR_PUMP, decision.solar_pump, decision.solar_reason, dry_run)
 
         if decision.ph_pulse_seconds > 0:
             await self._start_pulse(decision.ph_pulse_seconds, dry_run)

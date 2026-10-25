@@ -33,7 +33,11 @@
           "weather": "Weather",
           "outdoor_temperature_sensor": "Outdoor temperature sensor",
           "flow_sensor": "Flow sensor",
-          "pump_power_sensor": "Pump power sensor"
+          "pump_power_sensor": "Pump power sensor",
+          "solar_pump": "Solar pump",
+          "solar_collector_sensor": "Solar collector temperature",
+          "solar_demand_sensor": "Solar demand signal",
+          "pv_surplus_sensor": "PV surplus"
         },
         "data_description": {
           "ph_sensor": "Primary pH sensor in the flow cell.",
@@ -46,7 +50,11 @@
           "weather": "Weather entity providing the outdoor temperature (optional).",
           "outdoor_temperature_sensor": "Takes precedence over the weather entity (optional).",
           "flow_sensor": "Binary sensor that is on while water flows (optional).",
-          "pump_power_sensor": "Power of the filter pump, used as flow indicator (optional)."
+          "pump_power_sensor": "Power of the filter pump, used as flow indicator (optional).",
+          "solar_pump": "Pump or valve of the solar absorber (optional).",
+          "solar_collector_sensor": "Enables differential control (optional).",
+          "solar_demand_sensor": "Switching output of an existing solar controller (optional).",
+          "pv_surplus_sensor": "Binary sensor or power sensor in W (optional)."
         }
       }
     },
@@ -56,6 +64,8 @@
       "pulse_exceeds_auto_off": "The pulse must be at least 5 s shorter than the hardware auto-off.",
       "salt_invalid": "The maximum must be higher than the minimum.",
       "swim_ph_invalid": "The maximum must be higher than the minimum.",
+      "solar_delta_invalid": "The switch-off difference must be lower than the switch-on difference.",
+      "solar_source_conflict": "Use either a collector temperature or a demand signal, not both.",
       "duplicate_actuator": "Each actuator needs its own switch."
     }
   },
@@ -70,6 +80,7 @@
           "chlorine": "Chlorination",
           "ph_dosing": "pH dosing",
           "frost_swimming": "Frost protection and swimming",
+          "solar_pv": "Solar heating and PV surplus",
           "maintenance": "Maintenance"
         }
       },
@@ -89,7 +100,11 @@
           "weather": "Weather",
           "outdoor_temperature_sensor": "Outdoor temperature sensor",
           "flow_sensor": "Flow sensor",
-          "pump_power_sensor": "Pump power sensor"
+          "pump_power_sensor": "Pump power sensor",
+          "solar_pump": "Solar pump",
+          "solar_collector_sensor": "Solar collector temperature",
+          "solar_demand_sensor": "Solar demand signal",
+          "pv_surplus_sensor": "PV surplus"
         },
         "data_description": {
           "pump": "Switch of the filter pump.",
@@ -105,7 +120,11 @@
           "weather": "Weather entity providing the outdoor temperature (optional).",
           "outdoor_temperature_sensor": "Takes precedence over the weather entity (optional).",
           "flow_sensor": "Binary sensor that is on while water flows (optional).",
-          "pump_power_sensor": "Power of the filter pump, used as flow indicator (optional)."
+          "pump_power_sensor": "Power of the filter pump, used as flow indicator (optional).",
+          "solar_pump": "Pump or valve of the solar absorber (optional).",
+          "solar_collector_sensor": "Enables differential control (optional).",
+          "solar_demand_sensor": "Switching output of an existing solar controller (optional).",
+          "pv_surplus_sensor": "Binary sensor or power sensor in W (optional)."
         }
       },
       "filtration": {
@@ -219,6 +238,25 @@
           "swim_data_max_age_hours": "Older measurements are not used for the assessment."
         }
       },
+      "solar_pv": {
+        "title": "Solar heating and PV surplus",
+        "data": {
+          "solar_delta_on": "Switch-on difference",
+          "solar_delta_off": "Switch-off difference",
+          "solar_max_water_temperature": "Maximum water temperature",
+          "solar_min_switch_minutes": "Minimum switching interval",
+          "solar_requires_filter_pump": "Solar requires filter pump",
+          "pv_min_surplus": "Minimum PV surplus",
+          "pv_min_run_minutes": "Minimum PV run time"
+        },
+        "data_description": {
+          "solar_delta_on": "Collector minus water temperature to start solar heating.",
+          "solar_max_water_temperature": "No solar heating above this temperature.",
+          "solar_requires_filter_pump": "The absorber is part of the filter circuit.",
+          "pv_min_surplus": "Only used with a power sensor.",
+          "pv_min_run_minutes": "Minimum run time of a pump run started by surplus."
+        }
+      },
       "maintenance": {
         "title": "Maintenance",
         "description": "Reminder intervals in days.",
@@ -242,6 +280,8 @@
       "pulse_exceeds_auto_off": "The pulse must be at least 5 s shorter than the hardware auto-off.",
       "salt_invalid": "The maximum must be higher than the minimum.",
       "swim_ph_invalid": "The maximum must be higher than the minimum.",
+      "solar_delta_invalid": "The switch-off difference must be lower than the switch-on difference.",
+      "solar_source_conflict": "Use either a collector temperature or a demand signal, not both.",
       "duplicate_actuator": "Each actuator needs its own switch."
     }
   },
@@ -366,6 +406,9 @@
       "problem": {
         "name": "Problem"
       },
+      "solar_heating": {
+        "name": "Solar heating"
+      },
       "maintenance_due": {
         "name": "Maintenance due"
       },
@@ -461,6 +504,9 @@
     "switch": {
       "dry_run": {
         "name": "Dry run"
+      },
+      "solar_control": {
+        "name": "Solar control"
       },
       "chlorine_control": {
         "name": "Chlorine control"

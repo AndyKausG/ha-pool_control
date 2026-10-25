@@ -57,6 +57,9 @@ of the day reaches *(i + 1) / n* of the target.
 - Missed run time is caught up in the following slots.
 - The pump is not started for less than 15 minutes.
 
+**Other reasons to run:** PV surplus and solar heating (see below), extra
+circulation and frost protection.
+
 **Demand extension:** while the chlorinator runs or the pH is above the set
 point and dosing is possible, the pump keeps running inside the window up to
 the daily maximum.
@@ -67,6 +70,40 @@ minute) to flush the cell.
 
 **Extra circulation:** runs the pump for the configured duration on top of
 the schedule, for example after adding chemicals by hand.
+
+## Solar heating
+
+Two ways to control a solar absorber:
+
+- **Differential control** (collector temperature sensor configured): solar
+  heating starts when the collector is at least the switch-on difference
+  (default 6 K) warmer than the water and stops when the difference falls
+  below the switch-off difference (default 3 K) or the water reaches the
+  maximum temperature (default 30 °C). A minimum switching interval
+  (default 10 min) prevents flapping. The water temperature is the current
+  valid reading or, while the pump is off, the last valid reading.
+- **External signal** (demand sensor configured): the switching output of an
+  existing solar controller, for example read by a Shelly input or a
+  potential-free contact, is used as demand.
+
+If a solar pump or valve is configured, it is switched according to the
+demand. With *Solar requires filter pump* (default), the absorber is part of
+the filter circuit: in automatic mode the filter pump is started on demand
+(also outside the filtration window), the solar pump only runs while the
+filter pump runs, and it is part of the interlock. Run time during solar
+heating counts towards the filtration target.
+
+Solar heating is active in *Automatic* and *Manual* mode and can be disabled
+with `switch.<pool>_solar_control`.
+
+## PV surplus
+
+With a PV surplus sensor, the filtration run time is pulled forward: in
+automatic mode inside the filtration window the pump starts as soon as
+surplus is available and runs at least the minimum PV run time (default
+30 min), until the daily target is reached. The surplus sensor can be a
+binary sensor or a power sensor in W compared with the minimum surplus. With
+a pump power sensor, the pump's own consumption is added while it runs.
 
 ## Chlorination
 

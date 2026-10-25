@@ -36,11 +36,21 @@ from .const import (
     CONF_PH_PUMP_RATE,
     CONF_PH_QUIET_END,
     CONF_PH_QUIET_START,
+    CONF_PV_MIN_RUN,
+    CONF_PV_SURPLUS_SENSOR,
     CONF_RUNTIME_DIVISOR,
     CONF_RUNTIME_MAX,
     CONF_RUNTIME_MIN,
     CONF_SALT_MAX,
     CONF_SALT_MIN,
+    CONF_SOLAR_COLLECTOR_SENSOR,
+    CONF_SOLAR_DELTA_OFF,
+    CONF_SOLAR_DELTA_ON,
+    CONF_SOLAR_DEMAND_SENSOR,
+    CONF_SOLAR_MAX_TEMP,
+    CONF_SOLAR_MIN_SWITCH,
+    CONF_SOLAR_NEEDS_FILTER,
+    CONF_SOLAR_PUMP,
     CONF_STABILIZATION,
     CONF_STUCK_MINUTES,
     CONF_SWIM_DATA_MAX_AGE,
@@ -66,6 +76,7 @@ from .const import (
     OrpTargetMode,
     PhDosingMode,
     Problem,
+    SolarMode,
     Status,
     SwimmingStatus,
 )
@@ -130,6 +141,15 @@ class Settings:
     swim_ph_max: float
     swim_orp_min: float
     swim_data_max_age_h: float
+    solar_mode: SolarMode = SolarMode.NONE
+    has_solar_pump: bool = False
+    solar_delta_on: float = 6.0
+    solar_delta_off: float = 3.0
+    solar_max_temp: float = 30.0
+    solar_min_switch_min: float = 10.0
+    solar_requires_filter: bool = True
+    has_pv: bool = False
+    pv_min_run_min: float = 30.0
     maintenance_days: dict[MaintenanceTask, float] = field(default_factory=dict)
 
     @classmethod
@@ -186,6 +206,21 @@ class Settings:
             swim_ph_max=num(CONF_SWIM_PH_MAX),
             swim_orp_min=num(CONF_SWIM_ORP_MIN),
             swim_data_max_age_h=num(CONF_SWIM_DATA_MAX_AGE),
+            solar_mode=(
+                SolarMode.DIFFERENTIAL
+                if merged.get(CONF_SOLAR_COLLECTOR_SENSOR)
+                else SolarMode.EXTERNAL
+                if merged.get(CONF_SOLAR_DEMAND_SENSOR)
+                else SolarMode.NONE
+            ),
+            has_solar_pump=bool(merged.get(CONF_SOLAR_PUMP)),
+            solar_delta_on=num(CONF_SOLAR_DELTA_ON),
+            solar_delta_off=num(CONF_SOLAR_DELTA_OFF),
+            solar_max_temp=num(CONF_SOLAR_MAX_TEMP),
+            solar_min_switch_min=num(CONF_SOLAR_MIN_SWITCH),
+            solar_requires_filter=bool(merged[CONF_SOLAR_NEEDS_FILTER]),
+            has_pv=bool(merged.get(CONF_PV_SURPLUS_SENSOR)),
+            pv_min_run_min=num(CONF_PV_MIN_RUN),
             maintenance_days={
                 task: num(key)
                 for task, key in MAINTENANCE_OPTIONS.items()
@@ -224,6 +259,10 @@ class Snapshot:
     outdoor_temperature: float | None = None
     outdoor_configured: bool = False
     flow_ok: bool | None = None
+    solar_pump_on: bool = False
+    solar_collector_temperature: float | None = None
+    solar_demand_signal: bool | None = None
+    pv_surplus: bool | None = None
 
 
 def _dt_to_str(value: datetime | None) -> str | None:
@@ -243,6 +282,8 @@ _DATETIME_FIELDS = {
     "last_ph_pulse",
     "boost_until",
     "shock_until",
+    "solar_changed",
+    "pv_run_until",
     "last_water_test",
     "last_valid_measurement",
     "ph_session_last_pulse",
@@ -262,6 +303,7 @@ class RuntimeState:
     ph_target: float = DEFAULT_PH_TARGET
     chlorine_target: float = DEFAULT_CHLORINE_TARGET
     boost_hours: float = DEFAULT_BOOST_HOURS
+    solar_enabled: bool = True
     shock_target: float = DEFAULT_SHOCK_TARGET
     shock_hours: float = DEFAULT_SHOCK_HOURS
 
@@ -318,6 +360,9 @@ class RuntimeState:
     boost_until: datetime | None = None
     shock_until: datetime | None = None
     frost_active: bool = False
+    solar_active: bool = False
+    solar_changed: datetime | None = None
+    pv_run_until: datetime | None = None
 
     def to_dict(self) -> dict[str, Any]:
         """Serialize for storage."""
@@ -369,6 +414,8 @@ class Decision:
     chlorinator_reason: str = ""
     ph_pulse_seconds: float = 0.0
     ph_pump_stop: bool = False
+    solar_pump: bool | None = None
+    solar_reason: str = ""
     ph_pulse_reason: str = ""
     ph_blocked_reason: str | None = None
     orp_target: float | None = None
