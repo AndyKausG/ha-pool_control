@@ -23,8 +23,8 @@ were real devices.
    | Filter pump | `input_boolean.pool_test_pump` |
    | Salt chlorinator | `input_boolean.pool_test_chlorinator` |
    | pH minus dosing pump | `input_boolean.pool_test_ph_pump` |
-   | pH / ORP / water temperature | `sensor.pool_test_ph` / `sensor.pool_test_orp` / `sensor.pool_test_water_temperature` |
-   | Salt sensor | `sensor.pool_test_salt` |
+   | pH / ORP / water temperature | `sensor.pool_bench_ph` / `sensor.pool_bench_orp` / `sensor.pool_bench_water_temperature` |
+   | Salt sensor | `sensor.pool_bench_salt` |
    | Weather | your weather entity (optional) |
 
 5. Speed up the test: *Configure > Measurement* > stabilization time **1 min**.

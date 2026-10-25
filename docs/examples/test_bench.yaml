@@ -67,25 +67,25 @@ template:
           - input_number.pool_test_temperature
           - input_number.pool_test_salt
     sensor:
-      - name: "Pool test pH"
-        unique_id: pool_test_ph
+      - name: "Pool bench pH"
+        unique_id: pool_bench_ph
         device_class: ph
         state_class: measurement
         state: "{{ states('input_number.pool_test_ph') | float(0) }}"
-      - name: "Pool test ORP"
-        unique_id: pool_test_orp
+      - name: "Pool bench ORP"
+        unique_id: pool_bench_orp
         device_class: voltage
         unit_of_measurement: mV
         state_class: measurement
         state: "{{ states('input_number.pool_test_orp') | float(0) }}"
-      - name: "Pool test water temperature"
-        unique_id: pool_test_temperature
+      - name: "Pool bench water temperature"
+        unique_id: pool_bench_temperature
         device_class: temperature
         unit_of_measurement: °C
         state_class: measurement
         state: "{{ states('input_number.pool_test_temperature') | float(0) }}"
-      - name: "Pool test salt"
-        unique_id: pool_test_salt
+      - name: "Pool bench salt"
+        unique_id: pool_bench_salt
         unit_of_measurement: ppm
         state_class: measurement
         state: "{{ states('input_number.pool_test_salt') | float(0) }}"
