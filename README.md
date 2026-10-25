@@ -1,3 +1,5 @@
+<p align="center"><img src="brand/logo@2x.png" alt="Pool Control" width="360"></p>
+
 # Pool Control
 
 [![Tests](https://github.com/AndyKausG/ha-pool_control/actions/workflows/tests.yml/badge.svg)](https://github.com/AndyKausG/ha-pool_control/actions/workflows/tests.yml)

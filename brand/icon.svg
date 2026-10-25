@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <linearGradient id="drop" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#29A8F0"/>
+      <stop offset="1" stop-color="#0B5CAD"/>
+    </linearGradient>
+    <linearGradient id="water" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#5FD3F3"/>
+      <stop offset="1" stop-color="#1C9BD8"/>
+    </linearGradient>
+    <clipPath id="clip">
+      <path d="M256 40 C318 128 412 220 412 318 A156 156 0 0 1 100 318 C100 220 194 128 256 40 Z"/>
+    </clipPath>
+  </defs>
+  <path d="M256 40 C318 128 412 220 412 318 A156 156 0 0 1 100 318 C100 220 194 128 256 40 Z" fill="url(#drop)"/>
+  <g clip-path="url(#clip)">
+    <path d="M60 318 Q110 284 160 318 T260 318 T360 318 T460 318 V500 H60 Z" fill="url(#water)"/>
+    <path d="M60 318 Q110 284 160 318 T260 318 T360 318 T460 318" fill="none" stroke="#FFFFFF" stroke-width="18" stroke-linecap="round"/>
+    <path d="M60 384 Q110 352 160 384 T260 384 T360 384 T460 384" fill="none" stroke="#FFFFFF" stroke-opacity="0.75" stroke-width="14" stroke-linecap="round"/>
+  </g>
+  <path d="M178 230 C190 190 214 156 236 128" fill="none" stroke="#FFFFFF" stroke-opacity="0.55" stroke-width="16" stroke-linecap="round"/>
+</svg>

@@ -52,3 +52,11 @@ Pool Control.
 - Dosing pump rate: either measure it once (run the pump 60 s into a measuring
   cylinder) or give the refilled amount with the action `ph_tank_refilled`
   after each refill.
+
+## Brand images
+
+`brand/` contains the icon and logo in the sizes required by the
+[Home Assistant brands repository](https://github.com/home-assistant/brands)
+(`icon.png` 256x256, `icon@2x.png` 512x512, `logo.png`, `logo@2x.png`) plus
+the SVG sources. Home Assistant and HACS show the icon once it has been added
+to `custom_integrations/pool_control` in that repository.
