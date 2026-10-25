@@ -56,6 +56,7 @@ from .const import (
     STABILIZER_WARNING_PPM,
     STORAGE_VERSION,
     UPDATE_INTERVAL_SECONDS,
+    MaintenanceTask,
     OperatingMode,
     OrpTargetMode,
     Problem,
@@ -125,6 +126,7 @@ class PoolCoordinator(DataUpdateCoordinator[Decision]):
         self._pulse_off: CALLBACK_TYPE | None = None
         self._ph_pump_on_at: datetime | None = None
         self._problems: set[Problem] = set()
+        self._maintenance_due: set[MaintenanceTask] = set()
         self._simulated: dict[str, Any] = {}
 
     @property
@@ -323,6 +325,7 @@ class PoolCoordinator(DataUpdateCoordinator[Decision]):
         decision = self.controller.step(self.snapshot())
         await self._execute(decision)
         self._update_problems(decision.problems)
+        self._update_maintenance(decision.maintenance_due)
         self._check_missing_entities()
         self._check_stabilizer_issue()
         self.save()
@@ -415,6 +418,19 @@ class PoolCoordinator(DataUpdateCoordinator[Decision]):
             self._log(f"Problem resolved: {problem.value}")
             self._fire("problem_resolved", problem=problem.value)
         self._problems = set(problems)
+
+    def _update_maintenance(self, due: list[MaintenanceTask]) -> None:
+        for task in set(due) - self._maintenance_due:
+            self._log(f"Maintenance due: {task.value}")
+            self._fire("maintenance_due", task=task.value)
+        self._maintenance_due = set(due)
+
+    async def async_maintenance_done(self, task: MaintenanceTask) -> None:
+        """Mark a maintenance task as done."""
+        self.controller.maintenance_done(task, dt_util.now())
+        self._log(f"Maintenance done: {task.value}")
+        self.save()
+        await self.async_refresh()
 
     def _check_missing_entities(self) -> None:
         if not self.hass.is_running:

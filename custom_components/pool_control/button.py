@@ -6,9 +6,11 @@ from collections.abc import Awaitable, Callable
 from dataclasses import dataclass
 
 from homeassistant.components.button import ButtonEntity, ButtonEntityDescription
+from homeassistant.const import EntityCategory
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddConfigEntryEntitiesCallback
 
+from .const import MaintenanceTask
 from .coordinator import PoolConfigEntry, PoolCoordinator
 from .entity import PoolEntity
 
@@ -59,6 +61,14 @@ BUTTONS: tuple[PoolButtonDescription, ...] = (
 )
 
 
+def _maintenance_button(task: MaintenanceTask) -> PoolButtonDescription:
+    return PoolButtonDescription(
+        key=f"{task.value}_done",
+        entity_category=EntityCategory.CONFIG,
+        press_fn=lambda c: c.async_maintenance_done(task),
+    )
+
+
 async def async_setup_entry(
     hass: HomeAssistant,
     entry: PoolConfigEntry,
@@ -66,12 +76,15 @@ async def async_setup_entry(
 ) -> None:
     """Set up buttons."""
     coordinator = entry.runtime_data
-    async_add_entities(
-        PoolButton(coordinator, description)
+    settings = coordinator.settings
+    descriptions = [
+        description
         for description in BUTTONS
-        if (coordinator.settings.has_ph_pump or not description.requires_ph_pump)
-        and (coordinator.settings.has_chlorinator or not description.requires_chlorinator)
-    )
+        if (settings.has_ph_pump or not description.requires_ph_pump)
+        and (settings.has_chlorinator or not description.requires_chlorinator)
+    ]
+    descriptions += [_maintenance_button(task) for task in settings.maintenance_days]
+    async_add_entities(PoolButton(coordinator, description) for description in descriptions)
 
 
 class PoolButton(PoolEntity, ButtonEntity):

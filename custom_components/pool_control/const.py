@@ -87,6 +87,30 @@ CONF_SWIM_ORP_MIN: Final = "swim_orp_min"
 CONF_SWIM_DATA_MAX_AGE: Final = "swim_data_max_age_hours"
 
 
+# --- Config keys: maintenance ----------------------------------------------
+CONF_MAINT_PH_CAL: Final = "maintenance_ph_calibration_days"
+CONF_MAINT_ORP_CAL: Final = "maintenance_orp_calibration_days"
+CONF_MAINT_BACKWASH: Final = "maintenance_backwash_days"
+CONF_MAINT_CELL: Final = "maintenance_cell_cleaning_days"
+
+
+class MaintenanceTask(StrEnum):
+    """Recurring maintenance tasks."""
+
+    PH_CALIBRATION = "ph_calibration"
+    ORP_CALIBRATION = "orp_calibration"
+    BACKWASH = "backwash"
+    CELL_CLEANING = "cell_cleaning"
+
+
+MAINTENANCE_OPTIONS: Final = {
+    MaintenanceTask.PH_CALIBRATION: CONF_MAINT_PH_CAL,
+    MaintenanceTask.ORP_CALIBRATION: CONF_MAINT_ORP_CAL,
+    MaintenanceTask.BACKWASH: CONF_MAINT_BACKWASH,
+    MaintenanceTask.CELL_CLEANING: CONF_MAINT_CELL,
+}
+
+
 class OperatingMode(StrEnum):
     """Operating mode selected by the user."""
 
@@ -247,6 +271,11 @@ DEFAULTS: Final[dict[str, object]] = {
     CONF_SWIM_PH_MAX: 7.8,
     CONF_SWIM_ORP_MIN: 650,
     CONF_SWIM_DATA_MAX_AGE: 6,
+    # Maintenance intervals in days, 0 disables the reminder
+    CONF_MAINT_PH_CAL: 90,
+    CONF_MAINT_ORP_CAL: 90,
+    CONF_MAINT_BACKWASH: 14,
+    CONF_MAINT_CELL: 90,
 }
 
 # Runtime settings exposed as entities, persisted in the store.

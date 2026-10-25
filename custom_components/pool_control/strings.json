@@ -69,7 +69,8 @@
           "measurement": "Measurement",
           "chlorine": "Chlorination",
           "ph_dosing": "pH dosing",
-          "frost_swimming": "Frost protection and swimming"
+          "frost_swimming": "Frost protection and swimming",
+          "maintenance": "Maintenance"
         }
       },
       "entities": {
@@ -217,6 +218,22 @@
           "frost_on_minutes": "Run time per hour in interval mode.",
           "swim_data_max_age_hours": "Older measurements are not used for the assessment."
         }
+      },
+      "maintenance": {
+        "title": "Maintenance",
+        "description": "Reminder intervals in days.",
+        "data": {
+          "maintenance_ph_calibration_days": "pH probe calibration",
+          "maintenance_orp_calibration_days": "ORP probe calibration",
+          "maintenance_backwash_days": "Filter backwash",
+          "maintenance_cell_cleaning_days": "Chlorinator cell cleaning"
+        },
+        "data_description": {
+          "maintenance_ph_calibration_days": "Interval in days, 0 disables the reminder.",
+          "maintenance_orp_calibration_days": "Interval in days, 0 disables the reminder.",
+          "maintenance_backwash_days": "Interval in days, 0 disables the reminder.",
+          "maintenance_cell_cleaning_days": "Interval in days, 0 disables the reminder."
+        }
       }
     },
     "error": {
@@ -292,6 +309,18 @@
       "saturation_index": {
         "name": "Saturation index"
       },
+      "maintenance_ph_calibration": {
+        "name": "Next pH calibration"
+      },
+      "maintenance_orp_calibration": {
+        "name": "Next ORP calibration"
+      },
+      "maintenance_backwash": {
+        "name": "Next backwash"
+      },
+      "maintenance_cell_cleaning": {
+        "name": "Next cell cleaning"
+      },
       "free_chlorine_test": {
         "name": "Free chlorine (test)"
       },
@@ -337,6 +366,9 @@
       "problem": {
         "name": "Problem"
       },
+      "maintenance_due": {
+        "name": "Maintenance due"
+      },
       "swimming_allowed": {
         "name": "Swimming allowed"
       },
@@ -371,6 +403,18 @@
       },
       "start_shock": {
         "name": "Start shock chlorination"
+      },
+      "ph_calibration_done": {
+        "name": "pH calibration done"
+      },
+      "orp_calibration_done": {
+        "name": "ORP calibration done"
+      },
+      "backwash_done": {
+        "name": "Backwash done"
+      },
+      "cell_cleaning_done": {
+        "name": "Cell cleaning done"
       },
       "stop_shock": {
         "name": "Stop shock chlorination"

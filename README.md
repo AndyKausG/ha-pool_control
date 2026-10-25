@@ -27,6 +27,8 @@ the pH minus dosing pump.
   minimum and an effect check that locks dosing if the pH does not respond.
 - **Water chemistry** - Manual water tests, Langelier saturation index, shock
   chlorination, stabilizer warning.
+- **Maintenance** - Reminders for probe calibration, backwash and cell
+  cleaning.
 - **Tank tracking** - Fill level, daily and seasonal consumption. Refills
   calibrate the real pump rate.
 - **Frost protection** - Runs the pump when the outdoor temperature drops
@@ -101,6 +103,9 @@ before switching over.
 | `binary_sensor.<pool>_swimming_allowed` | On if swimming is recommended |
 | `binary_sensor.<pool>_problem` | On if any problem is active; attribute `problems` |
 | `binary_sensor.<pool>_frost_protection` | Frost protection active |
+| `binary_sensor.<pool>_maintenance_due` | A maintenance task is due; attribute `tasks` |
+| `sensor.<pool>_next_backwash`, `_next_ph_calibration`, ... | Next due date per task |
+| `button.<pool>_backwash_done`, ... | Mark a task as done |
 | `binary_sensor.<pool>_ph_dosing_locked` | Dosing locked by the effect check |
 | `binary_sensor.<pool>_ph_minus_tank_low` | Tank below warning level |
 | `number.<pool>_ph_set_point` | pH set point |

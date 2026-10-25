@@ -69,7 +69,8 @@
           "measurement": "Messung",
           "chlorine": "Chlorierung",
           "ph_dosing": "pH-Dosierung",
-          "frost_swimming": "Frostschutz und Baden"
+          "frost_swimming": "Frostschutz und Baden",
+          "maintenance": "Wartung"
         }
       },
       "entities": {
@@ -217,6 +218,22 @@
           "frost_on_minutes": "Laufzeit pro Stunde im Intervallbetrieb.",
           "swim_data_max_age_hours": "Ältere Messwerte werden nicht bewertet."
         }
+      },
+      "maintenance": {
+        "title": "Wartung",
+        "description": "Erinnerungsintervalle in Tagen.",
+        "data": {
+          "maintenance_ph_calibration_days": "Kalibrierung pH-Sonde",
+          "maintenance_orp_calibration_days": "Kalibrierung Redox-Sonde",
+          "maintenance_backwash_days": "Filter-Rückspülung",
+          "maintenance_cell_cleaning_days": "Reinigung Elektrolysezelle"
+        },
+        "data_description": {
+          "maintenance_ph_calibration_days": "Intervall in Tagen, 0 = keine Erinnerung.",
+          "maintenance_orp_calibration_days": "Intervall in Tagen, 0 = keine Erinnerung.",
+          "maintenance_backwash_days": "Intervall in Tagen, 0 = keine Erinnerung.",
+          "maintenance_cell_cleaning_days": "Intervall in Tagen, 0 = keine Erinnerung."
+        }
       }
     },
     "error": {
@@ -292,6 +309,18 @@
       "saturation_index": {
         "name": "Sättigungsindex"
       },
+      "maintenance_ph_calibration": {
+        "name": "Nächste pH-Kalibrierung"
+      },
+      "maintenance_orp_calibration": {
+        "name": "Nächste Redox-Kalibrierung"
+      },
+      "maintenance_backwash": {
+        "name": "Nächste Rückspülung"
+      },
+      "maintenance_cell_cleaning": {
+        "name": "Nächste Zellenreinigung"
+      },
       "free_chlorine_test": {
         "name": "Freies Chlor (Test)"
       },
@@ -337,6 +366,9 @@
       "problem": {
         "name": "Problem"
       },
+      "maintenance_due": {
+        "name": "Wartung fällig"
+      },
       "swimming_allowed": {
         "name": "Baden möglich"
       },
@@ -371,6 +403,18 @@
       },
       "start_shock": {
         "name": "Schockchlorung starten"
+      },
+      "ph_calibration_done": {
+        "name": "pH-Kalibrierung erledigt"
+      },
+      "orp_calibration_done": {
+        "name": "Redox-Kalibrierung erledigt"
+      },
+      "backwash_done": {
+        "name": "Rückspülung erledigt"
+      },
+      "cell_cleaning_done": {
+        "name": "Zellenreinigung erledigt"
       },
       "stop_shock": {
         "name": "Schockchlorung beenden"

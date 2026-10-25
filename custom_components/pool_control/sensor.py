@@ -24,7 +24,7 @@ from homeassistant.const import (
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddConfigEntryEntitiesCallback
 
-from .const import MeasurementSource, Status, SwimmingStatus
+from .const import MaintenanceTask, MeasurementSource, Status, SwimmingStatus
 from .coordinator import PoolConfigEntry, PoolCoordinator
 from .entity import PoolEntity
 
@@ -219,6 +219,15 @@ SENSORS: tuple[PoolSensorDescription, ...] = (
 )
 
 
+def _maintenance_sensor(task: MaintenanceTask) -> PoolSensorDescription:
+    return PoolSensorDescription(
+        key=f"maintenance_{task.value}",
+        device_class=SensorDeviceClass.TIMESTAMP,
+        value_fn=lambda c: c.controller.maintenance_next(task),
+        attrs_fn=lambda c: {"last_done": c.state.maintenance_done.get(task.value)},
+    )
+
+
 async def async_setup_entry(
     hass: HomeAssistant,
     entry: PoolConfigEntry,
@@ -227,12 +236,14 @@ async def async_setup_entry(
     """Set up sensors."""
     coordinator = entry.runtime_data
     settings = coordinator.settings
-    async_add_entities(
-        PoolSensor(coordinator, description)
+    descriptions = [
+        description
         for description in SENSORS
         if (settings.has_chlorinator or not description.requires_chlorinator)
         and (settings.has_ph_pump or not description.requires_ph_pump)
-    )
+    ]
+    descriptions += [_maintenance_sensor(task) for task in settings.maintenance_days]
+    async_add_entities(PoolSensor(coordinator, description) for description in descriptions)
 
 
 class PoolSensor(PoolEntity, SensorEntity):

@@ -149,6 +149,7 @@ async def test_options_remove_optional_entity(hass: HomeAssistant) -> None:
             {"swim_ph_max": "swim_ph_invalid"},
         ),
         ("measurement", {"stabilization_minutes": 20}, None),
+        ("maintenance", {"maintenance_backwash_days": 7}, None),
     ],
 )
 async def test_options_steps(

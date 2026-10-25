@@ -363,6 +363,23 @@ async def test_water_test_and_shock(hass: HomeAssistant, loaded_entry: MockConfi
     assert state.shock_until is None
 
 
+async def test_maintenance(
+    hass: HomeAssistant, loaded_entry: MockConfigEntry, freezer: FrozenDateTimeFactory
+) -> None:
+    events = async_capture_events(hass, EVENT_POOL_CONTROL)
+    assert _state(hass, "binary_sensor.pool_maintenance_due") == "off"
+    assert hass.states.get("sensor.pool_next_backwash") is not None
+    freezer.tick(timedelta(days=15))
+    _report(hass)
+    await _tick(hass, freezer, 1)
+    assert _state(hass, "binary_sensor.pool_maintenance_due") == "on"
+    assert any(e.data.get("task") == "backwash" for e in events)
+    await hass.services.async_call(
+        "button", "press", {"entity_id": "button.pool_backwash_done"}, blocking=True
+    )
+    assert _state(hass, "binary_sensor.pool_maintenance_due") == "off"
+
+
 async def test_service_invalid_entry(hass: HomeAssistant, loaded_entry: MockConfigEntry) -> None:
     with pytest.raises(ServiceValidationError):
         await hass.services.async_call(

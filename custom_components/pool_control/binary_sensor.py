@@ -37,6 +37,11 @@ BINARY_SENSORS: tuple[PoolBinarySensorDescription, ...] = (
         attrs_fn=lambda c: {"problems": sorted(p.value for p in c.data.problems)},
     ),
     PoolBinarySensorDescription(
+        key="maintenance_due",
+        is_on_fn=lambda c: bool(c.data.maintenance_due),
+        attrs_fn=lambda c: {"tasks": [task.value for task in c.data.maintenance_due]},
+    ),
+    PoolBinarySensorDescription(
         key="swimming_allowed",
         is_on_fn=lambda c: c.data.swimming is SwimmingStatus.OK,
     ),

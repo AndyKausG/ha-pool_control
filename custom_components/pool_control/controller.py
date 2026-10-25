@@ -29,6 +29,7 @@ from .const import (
     SWIM_DOSING_BLOCK_MINUTES,
     TEMP_PLAUSIBLE,
     FrostMode,
+    MaintenanceTask,
     MeasurementSource,
     OperatingMode,
     OrpTargetMode,
@@ -87,6 +88,9 @@ class PoolController:
         now = snap.now
         self._accumulate(snap)
         self._roll_day(now)
+        for task in self.settings.maintenance_days:
+            # Start counting the interval when a reminder is first enabled.
+            self.state.maintenance_done.setdefault(task.value, now.isoformat())
         if self.state.shock_until is not None and now >= self.state.shock_until:
             self.state.shock_until = None
         self._track_switches(snap)
@@ -110,6 +114,7 @@ class PoolController:
         decision.next_filtration_start = self._next_filtration_start(snap)
         decision.problems = self._problems(snap, measurement)
         decision.status = self._status(snap)
+        decision.maintenance_due = self.maintenance_due(now)
         return decision
 
     def filtration_target_hours(self) -> float:
@@ -193,6 +198,27 @@ class PoolController:
     def stop_boost(self) -> None:
         """Cancel an active circulation boost."""
         self.state.boost_until = None
+
+    def maintenance_done(self, task: MaintenanceTask, now: datetime) -> None:
+        """Mark a maintenance task as done."""
+        self.state.maintenance_done[task.value] = now.isoformat()
+
+    def maintenance_next(self, task: MaintenanceTask) -> datetime | None:
+        """Return when a maintenance task is due next."""
+        days = self.settings.maintenance_days.get(task)
+        done = self.state.maintenance_done.get(task.value)
+        if days is None or done is None:
+            return None
+        return datetime.fromisoformat(done) + timedelta(days=days)
+
+    def maintenance_due(self, now: datetime) -> list[MaintenanceTask]:
+        """Return the maintenance tasks that are due."""
+        due = []
+        for task in self.settings.maintenance_days:
+            next_due = self.maintenance_next(task)
+            if next_due is not None and now >= next_due:
+                due.append(task)
+        return due
 
     def start_shock(self, now: datetime) -> None:
         """Raise the free chlorine target for the configured shock duration."""

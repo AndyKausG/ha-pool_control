@@ -73,6 +73,7 @@ from .const import (
     DEFAULT_NAME,
     DEFAULTS,
     DOMAIN,
+    MAINTENANCE_OPTIONS,
     FrostMode,
     OrpTargetMode,
     PhDosingMode,
@@ -191,6 +192,10 @@ FROST_SWIM_FIELDS: list[tuple[str, Any, bool]] = [
     (CONF_SWIM_DATA_MAX_AGE, _number(1, 72, 1, HOURS), True),
 ]
 
+MAINTENANCE_FIELDS: list[tuple[str, Any, bool]] = [
+    (key, _number(0, 365, 1, UnitOfTime.DAYS), True) for key in MAINTENANCE_OPTIONS.values()
+]
+
 OPTION_STEPS: dict[str, list[tuple[str, Any, bool]]] = {
     "entities": ACTUATOR_FIELDS + SENSOR_FIELDS,
     "filtration": FILTRATION_FIELDS,
@@ -198,6 +203,7 @@ OPTION_STEPS: dict[str, list[tuple[str, Any, bool]]] = {
     "chlorine": CHLORINE_FIELDS,
     "ph_dosing": PH_FIELDS,
     "frost_swimming": FROST_SWIM_FIELDS,
+    "maintenance": MAINTENANCE_FIELDS,
 }
 
 
@@ -337,6 +343,12 @@ class PoolControlOptionsFlow(OptionsFlow):
     ) -> ConfigFlowResult:
         """Edit pH dosing settings."""
         return await self._async_step("ph_dosing", user_input)
+
+    async def async_step_maintenance(
+        self, user_input: dict[str, Any] | None = None
+    ) -> ConfigFlowResult:
+        """Edit maintenance intervals."""
+        return await self._async_step("maintenance", user_input)
 
     async def async_step_frost_swimming(
         self, user_input: dict[str, Any] | None = None

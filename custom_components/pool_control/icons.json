@@ -17,10 +17,15 @@
       "ph_tank_level_percent": { "default": "mdi:storage-tank-outline" },
       "ph_pump_rate": { "default": "mdi:speedometer" },
       "ph_product_dose_learned": { "default": "mdi:school-outline" },
+      "maintenance_ph_calibration": { "default": "mdi:wrench-clock" },
+      "maintenance_orp_calibration": { "default": "mdi:wrench-clock" },
+      "maintenance_backwash": { "default": "mdi:wrench-clock" },
+      "maintenance_cell_cleaning": { "default": "mdi:wrench-clock" },
       "saturation_index": { "default": "mdi:scale-balance" },
       "free_chlorine_test": { "default": "mdi:test-tube" }
     },
     "binary_sensor": {
+      "maintenance_due": { "default": "mdi:wrench-check-outline", "state": { "on": "mdi:wrench-clock" } },
       "swimming_allowed": { "default": "mdi:swim", "state": { "off": "mdi:close-octagon-outline" } },
       "measurement_valid": { "default": "mdi:check-circle-outline", "state": { "off": "mdi:help-circle-outline" } },
       "ph_dosing_locked": { "default": "mdi:lock-outline" },
@@ -32,6 +37,10 @@
       "ph_tank_refilled": { "default": "mdi:cup-water" },
       "ph_manual_pulse": { "default": "mdi:needle" },
       "ph_reset_lock": { "default": "mdi:lock-open-outline" },
+      "ph_calibration_done": { "default": "mdi:check" },
+      "orp_calibration_done": { "default": "mdi:check" },
+      "backwash_done": { "default": "mdi:check" },
+      "cell_cleaning_done": { "default": "mdi:check" },
       "start_shock": { "default": "mdi:flash-alert-outline" },
       "stop_shock": { "default": "mdi:flash-off-outline" }
     },

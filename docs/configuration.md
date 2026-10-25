@@ -84,6 +84,17 @@ All parameters are changed in Settings > Devices & services > Pool Control >
 | Swimming minimum ORP | 650 mV | |
 | Swimming maximum data age | 6 h | |
 
+## Maintenance
+
+| Option | Default |
+|---|---|
+| pH probe calibration | 90 days |
+| ORP probe calibration | 90 days |
+| Filter backwash | 14 days |
+| Chlorinator cell cleaning | 90 days |
+
+0 disables a reminder.
+
 ## Settings as entities
 
 These values are changed directly on the device page and take effect

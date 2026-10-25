@@ -806,6 +806,29 @@ def test_status(mode: OperatingMode, kwargs: dict[str, Any], expected: Status) -
     assert make_controller(state).step(snap(**kwargs)).status is expected
 
 
+def test_maintenance_reminders() -> None:
+    from custom_components.pool_control.const import MaintenanceTask
+
+    controller = make_controller(running(), maintenance_orp_calibration_days=0)
+    assert MaintenanceTask.ORP_CALIBRATION not in controller.settings.maintenance_days
+    decision = controller.step(snap())
+    assert decision.maintenance_due == []
+    assert controller.maintenance_next(MaintenanceTask.BACKWASH) == NOON + timedelta(days=14)
+    later = NOON + timedelta(days=15)
+    decision = controller.step(snap(later))
+    assert decision.maintenance_due == [MaintenanceTask.BACKWASH]
+    controller.maintenance_done(MaintenanceTask.BACKWASH, later)
+    assert controller.step(snap(later)).maintenance_due == []
+    assert controller.maintenance_next(MaintenanceTask.ORP_CALIBRATION) is None
+
+
+def test_cell_cleaning_requires_chlorinator() -> None:
+    from custom_components.pool_control.const import MaintenanceTask
+
+    settings = Settings.from_options({"pump": "switch.pump"})
+    assert MaintenanceTask.CELL_CLEANING not in settings.maintenance_days
+
+
 def test_state_roundtrip() -> None:
     state = running(ph_lockout_until=NOON, tank_level_ml=100.0)
     restored = RuntimeState.from_dict({**state.to_dict(), "unknown": 1})

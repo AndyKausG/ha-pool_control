@@ -1,8 +1,10 @@
 blueprint:
-  name: Pool Control - notify about problems
+  name: Pool Control - notify about problems and maintenance
   description: >
-    Runs the given actions when Pool Control reports a problem. The problem
-    code (for example ph_tank_low) is available as {{ problem }}.
+    Runs the given actions when Pool Control reports a problem or a due
+    maintenance task. The code (for example ph_tank_low or backwash) is
+    available as {{ problem }}, the event type (problem or maintenance_due)
+    as {{ type }}.
   domain: automation
   source_url: https://github.com/AndyKausG/ha-pool_control/blob/main/blueprints/automation/pool_control/notify_problems.yaml
   input:
@@ -22,6 +24,10 @@ triggers:
     event_type: pool_control_event
     event_data:
       type: problem
+  - trigger: event
+    event_type: pool_control_event
+    event_data:
+      type: maintenance_due
 
 conditions:
   - condition: template
@@ -29,7 +35,8 @@ conditions:
 
 variables:
   entry_id: !input pool
-  problem: "{{ trigger.event.data.problem }}"
+  type: "{{ trigger.event.data.type }}"
+  problem: "{{ trigger.event.data.problem | default(trigger.event.data.task) }}"
 
 actions: !input actions
 

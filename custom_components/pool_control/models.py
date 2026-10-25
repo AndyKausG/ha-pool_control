@@ -58,7 +58,9 @@ from .const import (
     DEFAULT_SHOCK_HOURS,
     DEFAULT_SHOCK_TARGET,
     DEFAULTS,
+    MAINTENANCE_OPTIONS,
     FrostMode,
+    MaintenanceTask,
     MeasurementSource,
     OperatingMode,
     OrpTargetMode,
@@ -128,6 +130,7 @@ class Settings:
     swim_ph_max: float
     swim_orp_min: float
     swim_data_max_age_h: float
+    maintenance_days: dict[MaintenanceTask, float] = field(default_factory=dict)
 
     @classmethod
     def from_options(cls, options: dict[str, Any]) -> Settings:
@@ -183,6 +186,14 @@ class Settings:
             swim_ph_max=num(CONF_SWIM_PH_MAX),
             swim_orp_min=num(CONF_SWIM_ORP_MIN),
             swim_data_max_age_h=num(CONF_SWIM_DATA_MAX_AGE),
+            maintenance_days={
+                task: num(key)
+                for task, key in MAINTENANCE_OPTIONS.items()
+                if num(key) > 0
+                and (
+                    task is not MaintenanceTask.CELL_CLEANING or bool(merged.get(CONF_CHLORINATOR))
+                )
+            },
         )
 
 
@@ -300,6 +311,9 @@ class RuntimeState:
     ph_pump_seconds_since_refill: float = 0.0
     ph_pump_rate_calibrated: float | None = None
 
+    # Maintenance: task -> ISO timestamp of the last completion
+    maintenance_done: dict[str, str] = field(default_factory=dict)
+
     # Misc
     boost_until: datetime | None = None
     shock_until: datetime | None = None
@@ -362,3 +376,4 @@ class Decision:
     next_filtration_start: datetime | None = None
     swimming: SwimmingStatus = SwimmingStatus.NO_DATA
     problems: set[Problem] = field(default_factory=set)
+    maintenance_due: list[MaintenanceTask] = field(default_factory=list)
