@@ -7,6 +7,10 @@
 [![HACS Custom](https://img.shields.io/badge/HACS-Custom-41BDF5.svg)](https://hacs.xyz/docs/faq/custom_repositories)
 [![License: MIT](https://img.shields.io/github/license/AndyKausG/ha-pool_control)](LICENSE)
 
+> **Beta:** Version 1.0.0 is a complete rewrite and has not yet been
+> validated on a real pool. Start with *Dry run* enabled and keep hardware
+> safeguards (relay auto-off, interlock script) in place.
+
 Home Assistant integration that controls filtration, salt water chlorination
 and pH dosing of a swimming pool using existing switch and sensor entities.
 

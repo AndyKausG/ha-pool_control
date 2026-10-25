@@ -4,7 +4,7 @@ All notable changes to this project are documented in this file. The format
 is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and the
 project uses [Semantic Versioning](https://semver.org/).
 
-## [1.0.0] - unreleased
+## [1.0.0-beta.1] - 2026-10-25
 
 Complete rewrite. Existing config entries are not migrated and must be set up
 again.
