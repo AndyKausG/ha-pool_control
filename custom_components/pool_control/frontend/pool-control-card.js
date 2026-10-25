@@ -81,6 +81,7 @@ const STYLE = `
   :host { display: block; }
   ha-card { padding: 16px; }
   .header { display: flex; align-items: center; gap: 12px; margin-bottom: 8px; }
+  .logo { width: 22px; height: 30px; flex: none; }
   .title { font-size: 20px; font-weight: 500; flex: 1; min-width: 0;
     overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
   .chip { border-radius: 16px; padding: 4px 12px; font-size: 13px;
@@ -123,6 +124,29 @@ const STYLE = `
     color: var(--primary-text-color); cursor: pointer; }
   button:hover { background: var(--secondary-background-color); }
 `;
+
+// Pool Control logo (same artwork as brand/icon.png).
+const LOGO = `
+  <svg class="logo" viewBox="90 30 332 450" aria-hidden="true">
+    <defs>
+      <linearGradient id="pc-drop" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0" stop-color="#29A8F0"/><stop offset="1" stop-color="#0B5CAD"/>
+      </linearGradient>
+      <linearGradient id="pc-water" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0" stop-color="#5FD3F3"/><stop offset="1" stop-color="#1C9BD8"/>
+      </linearGradient>
+      <clipPath id="pc-clip">
+        <path d="M256 40 C318 128 412 220 412 318 A156 156 0 0 1 100 318 C100 220 194 128 256 40 Z"/>
+      </clipPath>
+    </defs>
+    <path d="M256 40 C318 128 412 220 412 318 A156 156 0 0 1 100 318 C100 220 194 128 256 40 Z" fill="url(#pc-drop)"/>
+    <g clip-path="url(#pc-clip)">
+      <path d="M60 318 Q110 284 160 318 T260 318 T360 318 T460 318 V500 H60 Z" fill="url(#pc-water)"/>
+      <path d="M60 318 Q110 284 160 318 T260 318 T360 318 T460 318" fill="none" stroke="#fff" stroke-width="18" stroke-linecap="round"/>
+      <path d="M60 384 Q110 352 160 384 T260 384 T360 384 T460 384" fill="none" stroke="#fff" stroke-opacity="0.75" stroke-width="14" stroke-linecap="round"/>
+    </g>
+    <path d="M178 230 C190 190 214 156 236 128" fill="none" stroke="#fff" stroke-opacity="0.55" stroke-width="16" stroke-linecap="round"/>
+  </svg>`;
 
 function esc(value) {
   return String(value ?? "").replace(/[&<>"']/g, (c) =>
@@ -232,6 +256,7 @@ class PoolControlCard extends HTMLElement {
       <style>${STYLE}</style>
       <ha-card>
         <div class="header">
+          ${LOGO}
           <div class="title">${esc(title)}</div>
           ${dryRun ? `<span class="chip warn" data-more="${map.dry_run}">${this._t("dry_run")}</span>` : ""}
           <span class="chip" data-more="${map.status}">${esc(this._format(map.status))}</span>

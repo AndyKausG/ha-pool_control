@@ -8,7 +8,8 @@ project uses [Semantic Versioning](https://semver.org/).
 
 ### Fixed
 
-- Dashboard card: schematic limited in size on wide dashboards
+- Dashboard card: schematic limited in size on wide dashboards, logo in the
+  header
 - Dashboard card is registered even if the frontend loads after the
   integration
 
