@@ -53,9 +53,11 @@ from .const import (
     DEFAULTS,
     DOMAIN,
     EVENT_POOL_CONTROL,
+    STABILIZER_WARNING_PPM,
     STORAGE_VERSION,
     UPDATE_INTERVAL_SECONDS,
     OperatingMode,
+    OrpTargetMode,
     Problem,
 )
 from .controller import PoolController
@@ -322,6 +324,7 @@ class PoolCoordinator(DataUpdateCoordinator[Decision]):
         await self._execute(decision)
         self._update_problems(decision.problems)
         self._check_missing_entities()
+        self._check_stabilizer_issue()
         self.save()
         return decision
 
@@ -499,6 +502,54 @@ class PoolCoordinator(DataUpdateCoordinator[Decision]):
             )
         await self._start_pulse(self.settings.ph_pulse_s, False)
         self.save()
+
+    def _check_stabilizer_issue(self) -> None:
+        issue_id = f"stabilizer_orp_{self.config_entry.entry_id}"
+        cya = self.state.cyanuric_acid or 0.0
+        if (
+            self.settings.has_chlorinator
+            and cya >= STABILIZER_WARNING_PPM
+            and self.settings.orp_mode is OrpTargetMode.PH_COMPENSATED
+        ):
+            ir.async_create_issue(
+                self.hass,
+                DOMAIN,
+                issue_id,
+                is_fixable=False,
+                severity=ir.IssueSeverity.WARNING,
+                translation_key="stabilizer_orp",
+                translation_placeholders={"name": self.config_entry.title, "cya": f"{cya:.0f}"},
+            )
+        else:
+            ir.async_delete_issue(self.hass, DOMAIN, issue_id)
+
+    def salt_ppm(self) -> float | None:
+        """Return the current salt reading, if any."""
+        return self._reading(CONF_SALT_SENSOR).value
+
+    async def async_start_shock(self) -> None:
+        """Start a shock chlorination."""
+        self.controller.start_shock(dt_util.now())
+        self._log("Shock chlorination started")
+        self.save()
+        await self.async_refresh()
+
+    async def async_stop_shock(self) -> None:
+        """End a shock chlorination."""
+        self.controller.stop_shock()
+        self._log("Shock chlorination stopped")
+        self.save()
+        await self.async_refresh()
+
+    async def async_record_water_test(self, **values: float) -> None:
+        """Store the results of a manual water test."""
+        self.controller.record_water_test(dt_util.now(), **values)
+        self._log(
+            "Water test recorded: "
+            + ", ".join(f"{key} {value:g}" for key, value in sorted(values.items()))
+        )
+        self.save()
+        await self.async_refresh()
 
     def diagnostics_problems(self) -> list[str]:
         """Return the active problems for diagnostics."""

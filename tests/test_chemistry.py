@@ -82,3 +82,17 @@ def test_filtration_hours(temp: float, expected: float) -> None:
 
 def test_filtration_hours_invalid_divisor() -> None:
     assert chemistry.filtration_hours(20, 0, 2, 12) == 12
+
+
+def test_saturation_index() -> None:
+    assert chemistry.saturation_index(7.4, 26, 250, 100, tds_ppm=3500) == pytest.approx(
+        -0.22, abs=0.01
+    )
+    balanced = chemistry.saturation_index(7.6, 28, 300, 120, tds_ppm=3500)
+    assert balanced is not None
+    assert balanced > 0
+    with_cya = chemistry.saturation_index(7.4, 26, 250, 100, cyanuric_acid_ppm=60, tds_ppm=3500)
+    assert with_cya is not None
+    assert with_cya < -0.22
+    assert chemistry.saturation_index(7.4, 26, 0, 100) is None
+    assert chemistry.saturation_index(7.4, 26, 250, 10, cyanuric_acid_ppm=60) is None

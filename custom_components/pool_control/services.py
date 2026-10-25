@@ -36,10 +36,18 @@ SERVICE_RESET_PH_LOCK = "reset_ph_lock"
 SERVICE_RESET_SEASON = "reset_season"
 SERVICE_PH_CORRECTION = "calculate_ph_correction"
 SERVICE_SALT_CORRECTION = "calculate_salt_correction"
+SERVICE_WATER_TEST = "record_water_test"
+WATER_TEST_FIELDS = ("alkalinity", "calcium_hardness", "cyanuric_acid", "free_chlorine")
 
 BASE_SCHEMA = vol.Schema({vol.Required(ATTR_CONFIG_ENTRY_ID): cv.string})
 
 SCHEMAS: dict[str, vol.Schema] = {
+    SERVICE_WATER_TEST: BASE_SCHEMA.extend(
+        {
+            vol.Optional(field): vol.All(vol.Coerce(float), vol.Range(min=0, max=2000))
+            for field in WATER_TEST_FIELDS
+        }
+    ),
     SERVICE_START_BOOST: BASE_SCHEMA.extend(
         {vol.Optional(ATTR_HOURS): vol.All(vol.Coerce(float), vol.Range(min=0.1, max=24))}
     ),
@@ -140,7 +148,13 @@ async def _salt_correction(hass: HomeAssistant, call: ServiceCall) -> ServiceRes
     }
 
 
+async def _water_test(hass: HomeAssistant, call: ServiceCall) -> None:
+    values = {key: call.data[key] for key in WATER_TEST_FIELDS if key in call.data}
+    await _coordinator(hass, call).async_record_water_test(**values)
+
+
 HANDLERS: dict[str, tuple[Any, SupportsResponse]] = {
+    SERVICE_WATER_TEST: (_water_test, SupportsResponse.NONE),
     SERVICE_START_BOOST: (_start_boost, SupportsResponse.NONE),
     SERVICE_STOP_BOOST: (_stop_boost, SupportsResponse.NONE),
     SERVICE_TANK_REFILLED: (_tank_refilled, SupportsResponse.NONE),

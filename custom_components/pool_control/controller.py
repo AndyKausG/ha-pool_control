@@ -16,6 +16,7 @@ from .const import (
     ALARM_PH_MAX,
     ALARM_PH_MIN,
     CHLOR_NO_EFFECT_MIN_RISE_MV,
+    DEFAULT_TDS,
     DEVIATION_ORP,
     DEVIATION_PH,
     FALLBACK_WATER_TEMP,
@@ -86,6 +87,8 @@ class PoolController:
         now = snap.now
         self._accumulate(snap)
         self._roll_day(now)
+        if self.state.shock_until is not None and now >= self.state.shock_until:
+            self.state.shock_until = None
         self._track_switches(snap)
 
         decision = Decision()
@@ -190,6 +193,40 @@ class PoolController:
     def stop_boost(self) -> None:
         """Cancel an active circulation boost."""
         self.state.boost_until = None
+
+    def start_shock(self, now: datetime) -> None:
+        """Raise the free chlorine target for the configured shock duration."""
+        self.state.shock_until = now + timedelta(hours=self.state.shock_hours)
+
+    def stop_shock(self) -> None:
+        """End a shock chlorination."""
+        self.state.shock_until = None
+
+    def shock_active(self, now: datetime) -> bool:
+        """Return True while a shock chlorination is running."""
+        return self.state.shock_until is not None and now < self.state.shock_until
+
+    def record_water_test(self, now: datetime, **values: float) -> None:
+        """Store the results of a manual water test."""
+        for key, value in values.items():
+            setattr(self.state, key, value)
+        self.state.last_water_test = now
+
+    def saturation_index(self, ph: float | None, salt: float | None) -> float | None:
+        """Return the Langelier saturation index from test values and readings."""
+        st = self.state
+        temperature = st.last_valid_temperature
+        ph = ph if ph is not None else st.last_valid_ph
+        if None in (ph, temperature, st.calcium_hardness, st.alkalinity):
+            return None
+        return chemistry.saturation_index(
+            ph,  # type: ignore[arg-type]
+            temperature,  # type: ignore[arg-type]
+            st.calcium_hardness,  # type: ignore[arg-type]
+            st.alkalinity,  # type: ignore[arg-type]
+            cyanuric_acid_ppm=st.cyanuric_acid or 0.0,
+            tds_ppm=salt if salt else DEFAULT_TDS,
+        )
 
     # ------------------------------------------------------------------
     # Bookkeeping
@@ -343,13 +380,24 @@ class PoolController:
             st.temp_sum_today += m.temperature
             st.temp_count_today += 1
 
+    @property
+    def _chlorine_target(self) -> float:
+        st = self.state
+        if st.shock_until is not None:
+            return max(st.chlorine_target, st.shock_target)
+        return st.chlorine_target
+
     def _orp_target(self, m: Measurement) -> float:
         s = self.settings
         if s.orp_mode is OrpTargetMode.PH_COMPENSATED:
             ph = m.ph if m.ph is not None else self.state.last_valid_ph
             if ph is not None:
-                return chemistry.orp_target(ph, self.state.chlorine_target)
-        return s.orp_fixed_target
+                return chemistry.orp_target(ph, self._chlorine_target)
+        # Fixed set point: raise it by the chart difference during a shock.
+        raise_mv = chemistry.orp_target(7.4, self._chlorine_target) - chemistry.orp_target(
+            7.4, self.state.chlorine_target
+        )
+        return s.orp_fixed_target + raise_mv
 
     # ------------------------------------------------------------------
     # Frost protection
@@ -749,6 +797,8 @@ class PoolController:
             return SwimmingStatus.NO_DATA
         if minutes_between(st.last_ph_pulse, now) < SWIM_DOSING_BLOCK_MINUTES:
             return SwimmingStatus.DOSING
+        if self.shock_active(now):
+            return SwimmingStatus.SHOCK
         if ph < s.swim_ph_min:
             return SwimmingStatus.PH_LOW
         if ph > s.swim_ph_max:

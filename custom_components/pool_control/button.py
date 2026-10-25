@@ -19,6 +19,7 @@ class PoolButtonDescription(ButtonEntityDescription):
 
     press_fn: Callable[[PoolCoordinator], Awaitable[None]]
     requires_ph_pump: bool = False
+    requires_chlorinator: bool = False
 
 
 BUTTONS: tuple[PoolButtonDescription, ...] = (
@@ -29,6 +30,16 @@ BUTTONS: tuple[PoolButtonDescription, ...] = (
     PoolButtonDescription(
         key="stop_boost",
         press_fn=lambda c: c.async_stop_boost(),
+    ),
+    PoolButtonDescription(
+        key="start_shock",
+        press_fn=lambda c: c.async_start_shock(),
+        requires_chlorinator=True,
+    ),
+    PoolButtonDescription(
+        key="stop_shock",
+        press_fn=lambda c: c.async_stop_shock(),
+        requires_chlorinator=True,
     ),
     PoolButtonDescription(
         key="ph_tank_refilled",
@@ -58,7 +69,8 @@ async def async_setup_entry(
     async_add_entities(
         PoolButton(coordinator, description)
         for description in BUTTONS
-        if coordinator.settings.has_ph_pump or not description.requires_ph_pump
+        if (coordinator.settings.has_ph_pump or not description.requires_ph_pump)
+        and (coordinator.settings.has_chlorinator or not description.requires_chlorinator)
     )
 
 

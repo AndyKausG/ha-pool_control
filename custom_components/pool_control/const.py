@@ -148,6 +148,7 @@ class SwimmingStatus(StrEnum):
     PH_HIGH = "ph_high"
     ORP_LOW = "orp_low"
     DOSING = "dosing"
+    SHOCK = "shock"
     NO_DATA = "no_data"
 
 
@@ -252,3 +253,7 @@ DEFAULTS: Final[dict[str, object]] = {
 DEFAULT_PH_TARGET: Final = 7.2
 DEFAULT_CHLORINE_TARGET: Final = 2.0
 DEFAULT_BOOST_HOURS: Final = 2.0
+DEFAULT_SHOCK_TARGET: Final = 5.0
+DEFAULT_SHOCK_HOURS: Final = 24.0
+DEFAULT_TDS: Final = 1000.0
+STABILIZER_WARNING_PPM: Final = 20.0

@@ -289,6 +289,12 @@
       "ph_pump_rate": {
         "name": "Dosing pump rate"
       },
+      "saturation_index": {
+        "name": "Saturation index"
+      },
+      "free_chlorine_test": {
+        "name": "Free chlorine (test)"
+      },
       "ph_product_dose_learned": {
         "name": "Learned product dose"
       },
@@ -322,6 +328,7 @@
           "ph_high": "pH too high",
           "orp_low": "ORP too low",
           "dosing": "Dosing in progress",
+          "shock": "Shock chlorination",
           "no_data": "No data"
         }
       }
@@ -361,6 +368,12 @@
       },
       "ph_reset_lock": {
         "name": "Release pH dosing lock"
+      },
+      "start_shock": {
+        "name": "Start shock chlorination"
+      },
+      "stop_shock": {
+        "name": "Stop shock chlorination"
       }
     },
     "number": {
@@ -372,6 +385,21 @@
       },
       "boost_hours": {
         "name": "Extra circulation duration"
+      },
+      "shock_target": {
+        "name": "Shock chlorine target"
+      },
+      "shock_hours": {
+        "name": "Shock duration"
+      },
+      "alkalinity": {
+        "name": "Total alkalinity"
+      },
+      "calcium_hardness": {
+        "name": "Calcium hardness"
+      },
+      "cyanuric_acid": {
+        "name": "Cyanuric acid"
       }
     },
     "select": {
@@ -422,6 +450,10 @@
     "missing_entity": {
       "title": "Entity of {name} not found",
       "description": "The configured entity {entity_id} does not exist. Fix the assignment in the integration options."
+    },
+    "stabilizer_orp": {
+      "title": "Stabilizer affects the ORP set point of {name}",
+      "description": "The ORP chart assumes water without stabilizer. With {cya} ppm cyanuric acid the free chlorine is lower than the ORP suggests. Check the free chlorine with a test kit and use a fixed ORP set point or a higher chlorine target."
     }
   },
   "services": {
@@ -502,6 +534,32 @@
         "target_ph": {
           "name": "Target pH",
           "description": "Defaults to the pH set point."
+        }
+      }
+    },
+    "record_water_test": {
+      "name": "Record water test",
+      "description": "Stores the results of a manual water test.",
+      "fields": {
+        "config_entry_id": {
+          "name": "Pool",
+          "description": "The Pool Control entry."
+        },
+        "alkalinity": {
+          "name": "Total alkalinity",
+          "description": "ppm CaCO3"
+        },
+        "calcium_hardness": {
+          "name": "Calcium hardness",
+          "description": "ppm CaCO3"
+        },
+        "cyanuric_acid": {
+          "name": "Cyanuric acid",
+          "description": "Stabilizer in ppm"
+        },
+        "free_chlorine": {
+          "name": "Free chlorine",
+          "description": "ppm"
         }
       }
     },

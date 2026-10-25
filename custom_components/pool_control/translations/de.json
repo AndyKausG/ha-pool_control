@@ -289,6 +289,12 @@
       "ph_pump_rate": {
         "name": "Förderrate Dosierpumpe"
       },
+      "saturation_index": {
+        "name": "Sättigungsindex"
+      },
+      "free_chlorine_test": {
+        "name": "Freies Chlor (Test)"
+      },
       "ph_product_dose_learned": {
         "name": "Gelernte Produktdosierung"
       },
@@ -322,6 +328,7 @@
           "ph_high": "pH zu hoch",
           "orp_low": "Redox zu niedrig",
           "dosing": "Dosierung läuft",
+          "shock": "Schockchlorung",
           "no_data": "Keine Daten"
         }
       }
@@ -361,6 +368,12 @@
       },
       "ph_reset_lock": {
         "name": "pH-Dosiersperre aufheben"
+      },
+      "start_shock": {
+        "name": "Schockchlorung starten"
+      },
+      "stop_shock": {
+        "name": "Schockchlorung beenden"
       }
     },
     "number": {
@@ -372,6 +385,21 @@
       },
       "boost_hours": {
         "name": "Dauer Nachumwälzen"
+      },
+      "shock_target": {
+        "name": "Ziel Schockchlorung"
+      },
+      "shock_hours": {
+        "name": "Dauer Schockchlorung"
+      },
+      "alkalinity": {
+        "name": "Gesamtalkalität"
+      },
+      "calcium_hardness": {
+        "name": "Calciumhärte"
+      },
+      "cyanuric_acid": {
+        "name": "Cyanursäure"
       }
     },
     "select": {
@@ -422,6 +450,10 @@
     "missing_entity": {
       "title": "Entität von {name} nicht gefunden",
       "description": "Die konfigurierte Entität {entity_id} existiert nicht. Bitte die Zuordnung in den Optionen der Integration korrigieren."
+    },
+    "stabilizer_orp": {
+      "title": "Stabilisator beeinflusst den Redox-Sollwert von {name}",
+      "description": "Die Redox-Tabelle gilt für Wasser ohne Stabilisator. Mit {cya} ppm Cyanursäure ist das freie Chlor niedriger, als der Redoxwert vermuten lässt. Freies Chlor mit einem Testkit prüfen und einen festen Redox-Sollwert oder ein höheres Chlorziel verwenden."
     }
   },
   "services": {
@@ -502,6 +534,32 @@
         "target_ph": {
           "name": "Ziel-pH",
           "description": "Standard ist der pH-Sollwert."
+        }
+      }
+    },
+    "record_water_test": {
+      "name": "Wassertest erfassen",
+      "description": "Speichert die Ergebnisse eines manuellen Wassertests.",
+      "fields": {
+        "config_entry_id": {
+          "name": "Pool",
+          "description": "Der Pool-Control-Eintrag."
+        },
+        "alkalinity": {
+          "name": "Gesamtalkalität",
+          "description": "ppm CaCO3"
+        },
+        "calcium_hardness": {
+          "name": "Calciumhärte",
+          "description": "ppm CaCO3"
+        },
+        "cyanuric_acid": {
+          "name": "Cyanursäure",
+          "description": "Stabilisator in ppm"
+        },
+        "free_chlorine": {
+          "name": "Freies Chlor",
+          "description": "ppm"
         }
       }
     },

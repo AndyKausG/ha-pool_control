@@ -331,6 +331,38 @@ async def test_services(hass: HomeAssistant, loaded_entry: MockConfigEntry) -> N
     assert coordinator.state.ph_dosing_locked is False
 
 
+async def test_water_test_and_shock(hass: HomeAssistant, loaded_entry: MockConfigEntry) -> None:
+    entry_id = loaded_entry.entry_id
+    await hass.services.async_call(
+        DOMAIN,
+        "record_water_test",
+        {"config_entry_id": entry_id, "alkalinity": 100, "cyanuric_acid": 40, "free_chlorine": 1.5},
+        blocking=True,
+    )
+    state = loaded_entry.runtime_data.state
+    assert state.alkalinity == 100
+    assert state.cyanuric_acid == 40
+    assert _state(hass, "sensor.pool_free_chlorine_test") == "1.5"
+    assert _state(hass, "number.pool_cyanuric_acid") == "40.0"
+    registry = ir.async_get(hass)
+    assert registry.async_get_issue(DOMAIN, f"stabilizer_orp_{entry_id}") is not None
+
+    await hass.services.async_call(
+        "number", "set_value", {"entity_id": "number.pool_cyanuric_acid", "value": 0}, blocking=True
+    )
+    assert registry.async_get_issue(DOMAIN, f"stabilizer_orp_{entry_id}") is None
+
+    await hass.services.async_call(
+        "button", "press", {"entity_id": "button.pool_start_shock_chlorination"}, blocking=True
+    )
+    assert state.shock_until is not None
+    assert _state(hass, "sensor.pool_swimming_status") in ("shock", "no_data")
+    await hass.services.async_call(
+        "button", "press", {"entity_id": "button.pool_stop_shock_chlorination"}, blocking=True
+    )
+    assert state.shock_until is None
+
+
 async def test_service_invalid_entry(hass: HomeAssistant, loaded_entry: MockConfigEntry) -> None:
     with pytest.raises(ServiceValidationError):
         await hass.services.async_call(

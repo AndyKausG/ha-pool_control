@@ -16,7 +16,9 @@
       "ph_tank_level": { "default": "mdi:storage-tank-outline" },
       "ph_tank_level_percent": { "default": "mdi:storage-tank-outline" },
       "ph_pump_rate": { "default": "mdi:speedometer" },
-      "ph_product_dose_learned": { "default": "mdi:school-outline" }
+      "ph_product_dose_learned": { "default": "mdi:school-outline" },
+      "saturation_index": { "default": "mdi:scale-balance" },
+      "free_chlorine_test": { "default": "mdi:test-tube" }
     },
     "binary_sensor": {
       "swimming_allowed": { "default": "mdi:swim", "state": { "off": "mdi:close-octagon-outline" } },
@@ -29,12 +31,19 @@
       "stop_boost": { "default": "mdi:stop-circle-outline" },
       "ph_tank_refilled": { "default": "mdi:cup-water" },
       "ph_manual_pulse": { "default": "mdi:needle" },
-      "ph_reset_lock": { "default": "mdi:lock-open-outline" }
+      "ph_reset_lock": { "default": "mdi:lock-open-outline" },
+      "start_shock": { "default": "mdi:flash-alert-outline" },
+      "stop_shock": { "default": "mdi:flash-off-outline" }
     },
     "number": {
       "ph_target": { "default": "mdi:ph" },
       "chlorine_target": { "default": "mdi:water-check-outline" },
-      "boost_hours": { "default": "mdi:timer-outline" }
+      "boost_hours": { "default": "mdi:timer-outline" },
+      "shock_target": { "default": "mdi:flash-alert-outline" },
+      "shock_hours": { "default": "mdi:timer-alert-outline" },
+      "alkalinity": { "default": "mdi:test-tube" },
+      "calcium_hardness": { "default": "mdi:test-tube" },
+      "cyanuric_acid": { "default": "mdi:test-tube" }
     },
     "select": {
       "mode": { "default": "mdi:cog-outline" }
@@ -52,6 +61,7 @@
     "reset_ph_lock": { "service": "mdi:lock-open-outline" },
     "reset_season": { "service": "mdi:counter" },
     "calculate_ph_correction": { "service": "mdi:calculator" },
-    "calculate_salt_correction": { "service": "mdi:calculator" }
+    "calculate_salt_correction": { "service": "mdi:calculator" },
+    "record_water_test": { "service": "mdi:test-tube" }
   }
 }

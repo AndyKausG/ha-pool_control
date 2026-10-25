@@ -109,6 +109,19 @@ SENSORS: tuple[PoolSensorDescription, ...] = (
         requires_chlorinator=True,
     ),
     PoolSensorDescription(
+        key="saturation_index",
+        state_class=SensorStateClass.MEASUREMENT,
+        suggested_display_precision=2,
+        value_fn=lambda c: c.controller.saturation_index(c.data.measurement.ph, c.salt_ppm()),
+    ),
+    PoolSensorDescription(
+        key="free_chlorine_test",
+        native_unit_of_measurement="ppm",
+        suggested_display_precision=1,
+        value_fn=lambda c: c.state.free_chlorine,
+        attrs_fn=lambda c: {"last_water_test": c.state.last_water_test},
+    ),
+    PoolSensorDescription(
         key="swimming_status",
         device_class=SensorDeviceClass.ENUM,
         options=[status.value for status in SwimmingStatus],

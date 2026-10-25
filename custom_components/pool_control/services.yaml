@@ -108,3 +108,40 @@ calculate_salt_correction:
           step: 10
           unit_of_measurement: ppm
           mode: box
+
+record_water_test:
+  fields:
+    config_entry_id:
+      required: true
+      selector:
+        config_entry:
+          integration: pool_control
+    alkalinity:
+      selector:
+        number:
+          min: 0
+          max: 500
+          unit_of_measurement: ppm
+          mode: box
+    calcium_hardness:
+      selector:
+        number:
+          min: 0
+          max: 1500
+          unit_of_measurement: ppm
+          mode: box
+    cyanuric_acid:
+      selector:
+        number:
+          min: 0
+          max: 200
+          unit_of_measurement: ppm
+          mode: box
+    free_chlorine:
+      selector:
+        number:
+          min: 0
+          max: 20
+          step: 0.1
+          unit_of_measurement: ppm
+          mode: box

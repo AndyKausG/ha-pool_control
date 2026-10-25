@@ -6,6 +6,7 @@ All functions in this module are pure and independent of Home Assistant.
 from __future__ import annotations
 
 from bisect import bisect_right
+import math
 
 # ORP set points (mV) for a given free chlorine level (ppm) and pH.
 # Source: PoolRx Worldwide ORP/free chlorine correlation chart.
@@ -118,6 +119,32 @@ def salt_dilution_m3(volume_m3: float, current_ppm: float, target_ppm: float) ->
     if current_ppm <= target_ppm or current_ppm <= 0:
         return 0.0
     return volume_m3 * (1 - target_ppm / current_ppm)
+
+
+def saturation_index(
+    ph: float,
+    temp_c: float,
+    calcium_ppm: float,
+    alkalinity_ppm: float,
+    *,
+    cyanuric_acid_ppm: float = 0.0,
+    tds_ppm: float = 1000.0,
+) -> float | None:
+    """Return the Langelier saturation index.
+
+    Negative values indicate corrosive water, positive values scaling water.
+    The total alkalinity is corrected for cyanuric acid (one third of the
+    cyanuric acid concentration counts as alkalinity).
+    """
+    carbonate_alkalinity = alkalinity_ppm - cyanuric_acid_ppm / 3
+    if calcium_ppm <= 0 or carbonate_alkalinity <= 0 or tds_ppm <= 0:
+        return None
+    a = (math.log10(tds_ppm) - 1) / 10
+    b = -13.12 * math.log10(temp_c + 273.15) + 34.55
+    c = math.log10(calcium_ppm) - 0.4
+    d = math.log10(carbonate_alkalinity)
+    ph_saturation = (9.3 + a + b) - (c + d)
+    return round(ph - ph_saturation, 2)
 
 
 def filtration_hours(water_temp: float, divisor: float, minimum: float, maximum: float) -> float:

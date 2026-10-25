@@ -55,6 +55,8 @@ from .const import (
     DEFAULT_BOOST_HOURS,
     DEFAULT_CHLORINE_TARGET,
     DEFAULT_PH_TARGET,
+    DEFAULT_SHOCK_HOURS,
+    DEFAULT_SHOCK_TARGET,
     DEFAULTS,
     FrostMode,
     MeasurementSource,
@@ -229,6 +231,8 @@ _DATETIME_FIELDS = {
     "ph_lockout_until",
     "last_ph_pulse",
     "boost_until",
+    "shock_until",
+    "last_water_test",
     "last_valid_measurement",
     "ph_session_last_pulse",
     "last_accumulated",
@@ -247,6 +251,15 @@ class RuntimeState:
     ph_target: float = DEFAULT_PH_TARGET
     chlorine_target: float = DEFAULT_CHLORINE_TARGET
     boost_hours: float = DEFAULT_BOOST_HOURS
+    shock_target: float = DEFAULT_SHOCK_TARGET
+    shock_hours: float = DEFAULT_SHOCK_HOURS
+
+    # Manual water test
+    alkalinity: float | None = None
+    calcium_hardness: float | None = None
+    cyanuric_acid: float | None = None
+    free_chlorine: float | None = None
+    last_water_test: datetime | None = None
 
     # Daily counters
     day: str | None = None
@@ -289,6 +302,7 @@ class RuntimeState:
 
     # Misc
     boost_until: datetime | None = None
+    shock_until: datetime | None = None
     frost_active: bool = False
 
     def to_dict(self) -> dict[str, Any]:

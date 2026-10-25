@@ -96,6 +96,33 @@ A lower pH reduces the required ORP and thereby the chlorinator run time.
 run time, the problem `chlorinator_no_effect` is raised (salt level, cell or
 probe). Chlorination continues.
 
+**Shock chlorination:** raises the free chlorine target to the shock target
+(default 5.0 ppm) for the shock duration (default 24 h). With a fixed set
+point, the set point is raised by the chart difference at pH 7.4. Swimming is
+not recommended while a shock is active.
+
+**Stabilizer:** the ORP chart is valid for water without cyanuric acid.
+Stabilizer binds part of the free chlorine, so the same ORP corresponds to a
+higher total free chlorine. If a water test reports 20 ppm cyanuric acid or
+more while the pH compensated set point is used, a repair issue recommends
+checking the free chlorine with a test kit and adjusting the target.
+
+## Water tests and saturation index
+
+Results of manual water tests (total alkalinity, calcium hardness, cyanuric
+acid, free chlorine) are entered as number entities or with the action
+`record_water_test`. From these values and the measured pH and water
+temperature the Langelier saturation index is calculated:
+
+| Index | Meaning |
+|---|---|
+| below -0.3 | Corrosive, raise alkalinity or calcium hardness |
+| -0.3 to +0.3 | Balanced |
+| above +0.3 | Scaling, lower pH or alkalinity |
+
+The total alkalinity is corrected for cyanuric acid (one third of it), the
+salt reading is used as dissolved solids (1000 ppm without salt sensor).
+
 ## pH dosing
 
 A pulse starts when all conditions hold:
@@ -160,6 +187,7 @@ than the maximum data age:
 |---|---|
 | `no_data` | No recent readings |
 | `dosing` | pH pulse within the last 30 minutes |
+| `shock` | Shock chlorination active |
 | `ph_low` / `ph_high` | pH outside the swimming range (default 7.0-7.8) |
 | `orp_low` | ORP below minimum (default 650 mV) |
 | `ok` | Swimming allowed |

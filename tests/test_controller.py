@@ -740,6 +740,36 @@ def test_swimming_uses_recent_values_when_pump_off() -> None:
     assert make_controller(state).step(snap(pump=False)).swimming is SwimmingStatus.NO_DATA
 
 
+def test_shock_chlorination() -> None:
+    controller = make_controller(running())
+    controller.start_shock(NOON)
+    decision = controller.step(snap(ph=7.4))
+    assert decision.orp_target == 778
+    assert decision.swimming is SwimmingStatus.SHOCK
+    later = NOON + timedelta(hours=25)
+    decision = controller.step(snap(later, ph=7.4))
+    assert controller.state.shock_until is None
+    assert decision.orp_target == 748
+
+
+def test_shock_with_fixed_set_point() -> None:
+    controller = make_controller(running(), orp_target_mode="fixed")
+    controller.start_shock(NOON)
+    assert controller.step(snap()).orp_target == 735 + 30
+    controller.stop_shock()
+    assert controller.step(snap()).orp_target == 735
+
+
+def test_water_test_and_saturation_index() -> None:
+    controller = make_controller(running())
+    assert controller.saturation_index(7.4, None) is None
+    controller.record_water_test(NOON, alkalinity=100, calcium_hardness=250)
+    controller.step(snap(ph=7.4, temp=26))
+    assert controller.state.last_water_test == NOON
+    assert controller.saturation_index(7.4, 3500) == pytest.approx(-0.22, abs=0.01)
+    assert controller.saturation_index(None, None) is not None
+
+
 def test_swimming_blocked_after_dosing() -> None:
     state = running(last_ph_pulse=NOON - timedelta(minutes=10))
     assert make_controller(state).step(snap()).swimming is SwimmingStatus.DOSING

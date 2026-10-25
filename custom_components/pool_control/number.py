@@ -45,6 +45,53 @@ NUMBERS: tuple[PoolNumberDescription, ...] = (
         requires_chlorinator=True,
     ),
     PoolNumberDescription(
+        key="shock_target",
+        attribute="shock_target",
+        native_min_value=1.0,
+        native_max_value=5.0,
+        native_step=0.1,
+        native_unit_of_measurement=PPM,
+        mode=NumberMode.BOX,
+        requires_chlorinator=True,
+    ),
+    PoolNumberDescription(
+        key="shock_hours",
+        attribute="shock_hours",
+        native_min_value=1,
+        native_max_value=72,
+        native_step=1,
+        native_unit_of_measurement=UnitOfTime.HOURS,
+        mode=NumberMode.BOX,
+        requires_chlorinator=True,
+    ),
+    PoolNumberDescription(
+        key="alkalinity",
+        attribute="alkalinity",
+        native_min_value=0,
+        native_max_value=500,
+        native_step=1,
+        native_unit_of_measurement=PPM,
+        mode=NumberMode.BOX,
+    ),
+    PoolNumberDescription(
+        key="calcium_hardness",
+        attribute="calcium_hardness",
+        native_min_value=0,
+        native_max_value=1500,
+        native_step=1,
+        native_unit_of_measurement=PPM,
+        mode=NumberMode.BOX,
+    ),
+    PoolNumberDescription(
+        key="cyanuric_acid",
+        attribute="cyanuric_acid",
+        native_min_value=0,
+        native_max_value=200,
+        native_step=1,
+        native_unit_of_measurement=PPM,
+        mode=NumberMode.BOX,
+    ),
+    PoolNumberDescription(
         key="boost_hours",
         attribute="boost_hours",
         native_min_value=0.5,
@@ -83,9 +130,10 @@ class PoolNumber(PoolEntity, NumberEntity):
         self.entity_description = description
 
     @property
-    def native_value(self) -> float:
+    def native_value(self) -> float | None:
         """Return the current value."""
-        return float(getattr(self.coordinator.state, self.entity_description.attribute))
+        value = getattr(self.coordinator.state, self.entity_description.attribute)
+        return None if value is None else float(value)
 
     async def async_set_native_value(self, value: float) -> None:
         """Set a new value."""

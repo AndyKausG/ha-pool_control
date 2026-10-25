@@ -25,6 +25,8 @@ the pH minus dosing pump.
   chlorine target, or set to a fixed value.
 - **pH dosing** - Pulses with mixing pauses, daily limit, quiet hours, safety
   minimum and an effect check that locks dosing if the pH does not respond.
+- **Water chemistry** - Manual water tests, Langelier saturation index, shock
+  chlorination, stabilizer warning.
 - **Tank tracking** - Fill level, daily and seasonal consumption. Refills
   calibrate the real pump rate.
 - **Frost protection** - Runs the pump when the outdoor temperature drops
@@ -91,6 +93,11 @@ before switching over.
 | `sensor.<pool>_dosing_pump_rate` | Configured or calibrated pump rate |
 | `sensor.<pool>_learned_product_dose` | Product dose observed from pH response |
 | `sensor.<pool>_swimming_status` | Result of the swimming assessment |
+| `sensor.<pool>_saturation_index` | Langelier saturation index |
+| `sensor.<pool>_free_chlorine_test` | Free chlorine of the last water test |
+| `number.<pool>_total_alkalinity`, `_calcium_hardness`, `_cyanuric_acid` | Water test values |
+| `number.<pool>_shock_chlorine_target`, `_shock_duration` | Shock chlorination |
+| `button.<pool>_start_shock_chlorination` / `_stop_...` | Shock chlorination |
 | `binary_sensor.<pool>_swimming_allowed` | On if swimming is recommended |
 | `binary_sensor.<pool>_problem` | On if any problem is active; attribute `problems` |
 | `binary_sensor.<pool>_frost_protection` | Frost protection active |
@@ -120,6 +127,7 @@ respective switch is configured.
 | `pool_control.reset_season` | Reset the seasonal dosing counter |
 | `pool_control.calculate_ph_correction` | Returns the product amount for a pH correction |
 | `pool_control.calculate_salt_correction` | Returns the salt amount or water exchange |
+| `pool_control.record_water_test` | Store alkalinity, calcium hardness, cyanuric acid, free chlorine |
 
 ## Notifications
 
