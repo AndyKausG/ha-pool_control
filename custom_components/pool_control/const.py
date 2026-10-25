@@ -31,6 +31,7 @@ CONF_PUMP_POWER_SENSOR: Final = "pump_power_sensor"
 CONF_SOLAR_PUMP: Final = "solar_pump"
 CONF_SOLAR_COLLECTOR_SENSOR: Final = "solar_collector_sensor"
 CONF_SOLAR_DEMAND_SENSOR: Final = "solar_demand_sensor"
+CONF_SOLAR_WATER_SENSOR: Final = "solar_water_sensor"
 CONF_PV_SURPLUS_SENSOR: Final = "pv_surplus_sensor"
 
 # --- Config keys: pool ------------------------------------------------------
@@ -96,6 +97,7 @@ CONF_SOLAR_DELTA_ON: Final = "solar_delta_on"
 CONF_SOLAR_DELTA_OFF: Final = "solar_delta_off"
 CONF_SOLAR_MAX_TEMP: Final = "solar_max_water_temperature"
 CONF_SOLAR_MIN_SWITCH: Final = "solar_min_switch_minutes"
+CONF_SOLAR_MIN_ON: Final = "solar_min_on_minutes"
 CONF_SOLAR_NEEDS_FILTER: Final = "solar_requires_filter_pump"
 CONF_PV_MIN_SURPLUS: Final = "pv_min_surplus"
 CONF_PV_MIN_RUN: Final = "pv_min_run_minutes"
@@ -233,6 +235,8 @@ DEVIATION_ORP: Final = 100.0
 
 # Fixed controller constants.
 PUMP_MIN_START_MINUTES: Final = 15
+# Temperature sensors in pipes need flowing water for a representative value.
+TEMP_FLOW_MINUTES: Final = 5
 CHLOR_NO_EFFECT_MIN_RISE_MV: Final = 10.0
 PH_SUCCESS_MIN_DROP: Final = 0.03
 FROST_HYSTERESIS: Final = 1.0
@@ -298,6 +302,7 @@ DEFAULTS: Final[dict[str, object]] = {
     CONF_SOLAR_DELTA_OFF: 3.0,
     CONF_SOLAR_MAX_TEMP: 30.0,
     CONF_SOLAR_MIN_SWITCH: 10,
+    CONF_SOLAR_MIN_ON: 15,
     CONF_SOLAR_NEEDS_FILTER: False,
     CONF_PV_MIN_SURPLUS: 300,
     CONF_PV_MIN_RUN: 60,

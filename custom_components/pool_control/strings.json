@@ -36,6 +36,7 @@
           "pump_power_sensor": "Pump power sensor",
           "solar_pump": "Solar absorber pump",
           "solar_collector_sensor": "Solar absorber temperature",
+          "solar_water_sensor": "Pool water temperature in the solar circuit",
           "solar_demand_sensor": "Solar heating demand signal",
           "pv_surplus_sensor": "PV surplus"
         },
@@ -53,6 +54,7 @@
           "pump_power_sensor": "Power of the filter pump, used as flow indicator (optional).",
           "solar_pump": "Pump or valve of the solar absorber for pool heating (optional).",
           "solar_collector_sensor": "Enables the differential control of the solar heating (optional).",
+          "solar_water_sensor": "Pipe sensor in the solar circuit before the absorber; only used while the absorber pump runs (optional).",
           "solar_demand_sensor": "Switching output of an existing solar heating controller (optional).",
           "pv_surplus_sensor": "Photovoltaic surplus as binary sensor or power sensor in W (optional)."
         }
@@ -103,6 +105,7 @@
           "pump_power_sensor": "Pump power sensor",
           "solar_pump": "Solar absorber pump",
           "solar_collector_sensor": "Solar absorber temperature",
+          "solar_water_sensor": "Pool water temperature in the solar circuit",
           "solar_demand_sensor": "Solar heating demand signal",
           "pv_surplus_sensor": "PV surplus"
         },
@@ -123,6 +126,7 @@
           "pump_power_sensor": "Power of the filter pump, used as flow indicator (optional).",
           "solar_pump": "Pump or valve of the solar absorber for pool heating (optional).",
           "solar_collector_sensor": "Enables the differential control of the solar heating (optional).",
+          "solar_water_sensor": "Pipe sensor in the solar circuit before the absorber; only used while the absorber pump runs (optional).",
           "solar_demand_sensor": "Switching output of an existing solar heating controller (optional).",
           "pv_surplus_sensor": "Photovoltaic surplus as binary sensor or power sensor in W (optional)."
         }
@@ -244,7 +248,8 @@
           "solar_delta_on": "Solar heating: switch-on difference",
           "solar_delta_off": "Solar heating: switch-off difference",
           "solar_max_water_temperature": "Solar heating: maximum water temperature",
-          "solar_min_switch_minutes": "Solar heating: minimum switching interval",
+          "solar_min_on_minutes": "Solar heating: minimum run time",
+          "solar_min_switch_minutes": "Solar heating: minimum pause",
           "solar_requires_filter_pump": "Solar absorber in the filter circuit",
           "pv_min_surplus": "PV: minimum surplus",
           "pv_start_delay_minutes": "PV: start delay",
@@ -253,6 +258,7 @@
         "data_description": {
           "solar_delta_on": "Absorber minus water temperature to start the solar heating.",
           "solar_max_water_temperature": "No solar heating above this temperature.",
+          "solar_min_on_minutes": "Prevents cycling when the absorber cools down after the start.",
           "solar_requires_filter_pump": "On: the filter pump supplies the absorber and runs during solar heating. Off: the absorber has its own circuit and pump.",
           "pv_min_surplus": "Only used with a power sensor.",
           "pv_start_delay_minutes": "Surplus must be available this long before the pump starts (passing clouds).",

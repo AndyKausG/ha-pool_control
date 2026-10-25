@@ -53,6 +53,7 @@ from .const import (
     CONF_SOLAR_COLLECTOR_SENSOR,
     CONF_SOLAR_DEMAND_SENSOR,
     CONF_SOLAR_PUMP,
+    CONF_SOLAR_WATER_SENSOR,
     CONF_TEMP_SENSOR,
     CONF_WEATHER,
     DEFAULTS,
@@ -78,6 +79,7 @@ SAVE_DELAY_SECONDS = 10
 INPUT_KEYS = (
     CONF_SOLAR_COLLECTOR_SENSOR,
     CONF_SOLAR_DEMAND_SENSOR,
+    CONF_SOLAR_WATER_SENSOR,
     CONF_PV_SURPLUS_SENSOR,
     CONF_PH_SENSOR,
     CONF_ORP_SENSOR,
@@ -270,6 +272,7 @@ class PoolCoordinator(DataUpdateCoordinator[Decision]):
             solar_collector_temperature=self._reading(
                 CONF_SOLAR_COLLECTOR_SENSOR, temperature=True
             ).value,
+            solar_water=self._reading(CONF_SOLAR_WATER_SENSOR, temperature=True),
             solar_demand_signal=self._binary(CONF_SOLAR_DEMAND_SENSOR),
             pv_surplus=self._pv_surplus(),
         )

@@ -41,6 +41,13 @@ If the primary readings are invalid, backup sensors (for example a floating
 probe) are used for display, water quality alarms and the swimming assessment,
 as long as their last report is not older than the backup maximum age.
 
+**Water temperature** is handled separately: a sensor in a pipe shows the
+pool temperature only while water flows, but it needs only a few minutes, not
+the full stabilization time. The water temperature of the filter circuit is
+therefore valid after 5 minutes of flow. While no water flows, the last valid
+value is used where a pool temperature is needed (the pool temperature changes
+slowly).
+
 The mean of all valid water temperatures of a day is the reference for the
 filtration target of the next day.
 
@@ -80,11 +87,23 @@ Two ways to control the absorber:
 
 - **Differential control** (absorber temperature sensor configured): solar
   heating starts when the absorber is at least the switch-on difference
-  (default 6 K) warmer than the water and stops when the difference falls
+  (default 6 K) warmer than the pool water and stops when the difference falls
   below the switch-off difference (default 3 K) or the water reaches the
-  maximum temperature (default 30 °C). A minimum switching interval
-  (default 10 min) prevents flapping. The water temperature is the current
-  valid reading or, while the filter pump is off, the last valid reading.
+  maximum temperature (default 30 °C).
+
+  Pool water temperature for the differential, in this order:
+  1. Sensor in the solar circuit before the absorber, after the absorber pump
+     has run for 5 minutes
+  2. Sensor in the filter circuit, after the filter pump has run for 5 minutes
+  3. Last valid value of one of these sensors
+
+  The absorber sensor on the roof is always valid.
+
+  **No cycling:** when the absorber pump starts, cold pool water cools the
+  absorber and the difference collapses for a while. A minimum run time
+  (default 15 min) bridges this phase, a minimum pause (default 10 min)
+  prevents an immediate restart. Together with the hysteresis between
+  switch-on and switch-off difference this avoids short cycles.
 - **External signal** (demand signal configured): the switching output of an
   existing solar heating controller, for example read by a Shelly input, is
   used as demand.

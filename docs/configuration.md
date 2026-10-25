@@ -21,6 +21,7 @@ All parameters are changed in Settings > Devices & services > Pool Control >
 | Pump power sensor | no | Flow indicator if no flow sensor exists |
 | Solar absorber pump | no | Pump or valve of the solar absorber (pool heating) |
 | Solar absorber temperature | no | Enables differential control of the solar heating |
+| Pool water temperature in the solar circuit | no | Pipe sensor before the absorber, used while the absorber pump runs |
 | Solar heating demand signal | no | Switching output of an existing solar heating controller |
 | PV surplus | no | Photovoltaic surplus, binary sensor or power sensor (W) |
 
@@ -94,7 +95,8 @@ All parameters are changed in Settings > Devices & services > Pool Control >
 |---|---|---|
 | Solar heating: switch-on / switch-off difference | 6 K / 3 K | Absorber minus water temperature |
 | Solar heating: maximum water temperature | 30 °C | |
-| Solar heating: minimum switching interval | 10 min | |
+| Solar heating: minimum run time | 15 min | Bridges the cool-down of the absorber after the start |
+| Solar heating: minimum pause | 10 min | |
 | Solar absorber in the filter circuit | off | On: the filter pump supplies the absorber. Off: own circuit and pump |
 | PV: minimum surplus | 300 W | Power sensor only |
 | PV: start delay | 10 min | Surplus must be stable this long |

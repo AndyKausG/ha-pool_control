@@ -49,6 +49,7 @@ from .const import (
     CONF_SOLAR_DELTA_ON,
     CONF_SOLAR_DEMAND_SENSOR,
     CONF_SOLAR_MAX_TEMP,
+    CONF_SOLAR_MIN_ON,
     CONF_SOLAR_MIN_SWITCH,
     CONF_SOLAR_NEEDS_FILTER,
     CONF_SOLAR_PUMP,
@@ -148,6 +149,7 @@ class Settings:
     solar_delta_off: float = 3.0
     solar_max_temp: float = 30.0
     solar_min_switch_min: float = 10.0
+    solar_min_on_min: float = 15.0
     solar_requires_filter: bool = False
     has_pv: bool = False
     pv_min_run_min: float = 60.0
@@ -220,6 +222,7 @@ class Settings:
             solar_delta_off=num(CONF_SOLAR_DELTA_OFF),
             solar_max_temp=num(CONF_SOLAR_MAX_TEMP),
             solar_min_switch_min=num(CONF_SOLAR_MIN_SWITCH),
+            solar_min_on_min=num(CONF_SOLAR_MIN_ON),
             solar_requires_filter=bool(merged[CONF_SOLAR_NEEDS_FILTER]),
             has_pv=bool(merged.get(CONF_PV_SURPLUS_SENSOR)),
             pv_min_run_min=num(CONF_PV_MIN_RUN),
@@ -264,6 +267,7 @@ class Snapshot:
     flow_ok: bool | None = None
     solar_pump_on: bool = False
     solar_collector_temperature: float | None = None
+    solar_water: Reading = field(default_factory=lambda: Reading(None))
     solar_demand_signal: bool | None = None
     pv_surplus: bool | None = None
 
@@ -286,6 +290,7 @@ _DATETIME_FIELDS = {
     "boost_until",
     "shock_until",
     "solar_changed",
+    "solar_pump_on_since",
     "pv_run_until",
     "pv_surplus_since",
     "last_water_test",
@@ -366,6 +371,7 @@ class RuntimeState:
     frost_active: bool = False
     solar_active: bool = False
     solar_changed: datetime | None = None
+    solar_pump_on_since: datetime | None = None
     pv_run_until: datetime | None = None
     pv_surplus_since: datetime | None = None
 
@@ -403,6 +409,7 @@ class Measurement:
     ph: float | None = None
     orp: float | None = None
     temperature: float | None = None
+    temperature_primary: bool = False
     primary_valid: bool = False
     invalid_reason: str | None = None
 

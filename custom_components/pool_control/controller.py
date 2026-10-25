@@ -27,6 +27,7 @@ from .const import (
     PUMP_MIN_START_MINUTES,
     SALT_MAX_AGE_HOURS,
     SWIM_DOSING_BLOCK_MINUTES,
+    TEMP_FLOW_MINUTES,
     TEMP_PLAUSIBLE,
     FrostMode,
     MaintenanceTask,
@@ -311,6 +312,11 @@ class PoolController:
             st.chlorinator_start_orp = None
             if st.chlorinator_off_since is None:
                 st.chlorinator_off_since = now
+        if snap.solar_pump_on:
+            if st.solar_pump_on_since is None:
+                st.solar_pump_on_since = now
+        else:
+            st.solar_pump_on_since = None
         self._prev_pump_on = snap.pump_on
         self._prev_chlorinator_on = snap.chlorinator_on
 
@@ -338,13 +344,18 @@ class PoolController:
                 self._primary_reading_problem(snap.orp, ORP_PLAUSIBLE, now)
             )
 
+        flowing_temp = self._flowing_temperature(
+            snap.temperature, self.state.pump_on_since if self._flow(snap) else None, now
+        )
+        if flowing_temp is not None:
+            result.temperature = flowing_temp
+            result.temperature_primary = True
+
         if reason is None:
             result.source = MeasurementSource.PRIMARY
             result.primary_valid = True
             result.ph = snap.ph.value
             result.orp = snap.orp.value
-            if self._primary_reading_problem(snap.temperature, TEMP_PLAUSIBLE, now) is None:
-                result.temperature = snap.temperature.value
             return result
 
         result.invalid_reason = reason
@@ -354,8 +365,27 @@ class PoolController:
             result.source = MeasurementSource.BACKUP
             result.ph = backup_ph
             result.orp = backup_orp
-            result.temperature = self._backup_value(snap.backup_temperature, TEMP_PLAUSIBLE, now)
+            if result.temperature is None:
+                result.temperature = self._backup_value(
+                    snap.backup_temperature, TEMP_PLAUSIBLE, now
+                )
         return result
+
+    def _flowing_temperature(
+        self, reading: Reading, flowing_since: datetime | None, now: datetime
+    ) -> float | None:
+        """Return a pipe temperature if water has been flowing long enough.
+
+        Sensors in pipes show the water temperature only while water flows; a
+        few minutes are enough, the full stabilization time is not needed.
+        """
+        if flowing_since is None or minutes_between(flowing_since, now) < TEMP_FLOW_MINUTES:
+            return None
+        if not _plausible(reading.value, TEMP_PLAUSIBLE):
+            return None
+        if minutes_between(reading.last_reported, now) > self.settings.max_age_min:
+            return None
+        return reading.value
 
     def _primary_reading_problem(
         self, reading: Reading, limits: tuple[float, float], now: datetime
@@ -398,16 +428,16 @@ class PoolController:
         )
 
     def _remember_measurement(self, now: datetime, m: Measurement) -> None:
-        if not m.primary_valid:
-            return
         st = self.state
-        st.last_valid_measurement = now
-        st.last_valid_ph = m.ph
-        st.last_valid_orp = m.orp
-        if m.temperature is not None:
+        if m.temperature_primary and m.temperature is not None:
             st.last_valid_temperature = m.temperature
             st.temp_sum_today += m.temperature
             st.temp_count_today += 1
+        if not m.primary_valid:
+            return
+        st.last_valid_measurement = now
+        st.last_valid_ph = m.ph
+        st.last_valid_orp = m.orp
 
     @property
     def _chlorine_target(self) -> float:
@@ -563,11 +593,13 @@ class PoolController:
         elif s.solar_mode is SolarMode.EXTERNAL:
             st.solar_active = bool(snap.solar_demand_signal)
         else:
-            water = m.temperature if m.temperature is not None else st.last_valid_temperature
+            water = self._solar_water_temperature(snap, m)
             collector = snap.solar_collector_temperature
+            since_change = minutes_between(st.solar_changed, snap.now)
             if water is None or collector is None:
                 st.solar_active = False
-            elif minutes_between(st.solar_changed, snap.now) < s.solar_min_switch_min:
+            elif since_change < (s.solar_min_on_min if st.solar_active else s.solar_min_switch_min):
+                # Minimum run and pause times prevent cycling.
                 pass
             elif water >= s.solar_max_temp:
                 st.solar_active = False
@@ -577,6 +609,24 @@ class PoolController:
                 st.solar_active = collector - water >= s.solar_delta_on
         if st.solar_active != previous:
             st.solar_changed = snap.now
+
+    def _solar_water_temperature(self, snap: Snapshot, m: Measurement) -> float | None:
+        """Return the pool water temperature for the solar differential.
+
+        Pipe sensors only show the pool temperature while water flows: the
+        sensor in the solar circuit while the absorber pump runs, the sensor in
+        the filter circuit while the filter pump runs. Otherwise the last valid
+        value is used, as the pool temperature changes slowly.
+        """
+        solar_water = self._flowing_temperature(
+            snap.solar_water, self.state.solar_pump_on_since, snap.now
+        )
+        if solar_water is not None:
+            self.state.last_valid_temperature = solar_water
+            return solar_water
+        if m.temperature_primary and m.temperature is not None:
+            return m.temperature
+        return self.state.last_valid_temperature
 
     def _solar_wants_filter_pump(self) -> bool:
         return (

@@ -890,6 +890,74 @@ def test_solar_disabled_by_switch_and_mode() -> None:
     assert not controller.state.solar_active
 
 
+def test_water_temperature_needs_flow() -> None:
+    controller = make_controller(running(3))
+    decision = controller.step(snap(temp=25))
+    assert decision.measurement.temperature is None
+    controller = make_controller(running(6))
+    decision = controller.step(snap(temp=25))
+    # Valid after a few minutes of flow, before pH/ORP are stable.
+    assert not decision.measurement.primary_valid
+    assert decision.measurement.temperature == 25
+    assert controller.state.last_valid_temperature == 25
+    controller = make_controller(RuntimeState(mode="manual"))
+    assert controller.step(snap(pump=False, temp=25)).measurement.temperature is None
+
+
+def test_solar_own_circuit_uses_pipe_sensor() -> None:
+    state = RuntimeState(mode="manual", last_valid_temperature=22, solar_enabled=True)
+    controller = make_controller(state, **SOLAR_OPTIONS)
+    # Filter pump off: the last valid temperature is the reference.
+    decision = controller.step(snap(pump=False, temp=40, solar_collector_temperature=29))
+    assert controller.state.solar_active
+    assert decision.solar_pump is True
+    # The absorber cools down after the start: the minimum run time prevents cycling.
+    controller.step(
+        snap(
+            NOON + timedelta(minutes=1),
+            pump=False,
+            solar_pump_on=True,
+            solar_collector_temperature=24,
+        )
+    )
+    assert controller.state.solar_active
+    t = NOON + timedelta(minutes=7)
+    solar_water = Reading(23.0, t, t)
+    controller.step(
+        snap(
+            t,
+            pump=False,
+            temp=40,
+            solar_pump_on=True,
+            solar_water=solar_water,
+            solar_collector_temperature=24,
+        )
+    )
+    assert controller.state.solar_active
+    assert controller.state.last_valid_temperature == 23
+    # After the minimum run time the switch-off difference applies.
+    t = NOON + timedelta(minutes=16)
+    decision = controller.step(
+        snap(
+            t,
+            pump=False,
+            temp=40,
+            solar_pump_on=True,
+            solar_water=Reading(23.0, t, t),
+            solar_collector_temperature=25,
+        )
+    )
+    assert not controller.state.solar_active
+    assert decision.solar_pump is False
+    # Minimum pause before the next start.
+    t = NOON + timedelta(minutes=20)
+    controller.step(snap(t, pump=False, solar_collector_temperature=35))
+    assert not controller.state.solar_active
+    t = NOON + timedelta(minutes=27)
+    controller.step(snap(t, pump=False, solar_collector_temperature=35))
+    assert controller.state.solar_active
+
+
 def test_pv_surplus_runs_pump_early() -> None:
     now = datetime(2026, 7, 1, 12, 5, tzinfo=TZ)
     state = RuntimeState(

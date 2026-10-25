@@ -36,6 +36,7 @@
           "pump_power_sensor": "Pumpenleistung",
           "solar_pump": "Pumpe Solarabsorber",
           "solar_collector_sensor": "Temperatur Solarabsorber",
+          "solar_water_sensor": "Beckenwasser-Temperatur im Solarkreislauf",
           "solar_demand_sensor": "Anforderung Solarheizung",
           "pv_surplus_sensor": "PV-Überschuss"
         },
@@ -53,6 +54,7 @@
           "pump_power_sensor": "Leistung der Filterpumpe als Durchflussindikator (optional).",
           "solar_pump": "Pumpe oder Ventil des Solarabsorbers zur Beckenheizung (optional).",
           "solar_collector_sensor": "Aktiviert die Differenzregelung der Solarheizung (optional).",
+          "solar_water_sensor": "Rohrsensor im Solarkreislauf vor dem Absorber; wird nur bei laufender Absorberpumpe verwendet (optional).",
           "solar_demand_sensor": "Schaltausgang einer vorhandenen Solarheizungs-Steuerung (optional).",
           "pv_surplus_sensor": "Überschuss der Photovoltaikanlage als Binärsensor oder Leistungssensor in W (optional)."
         }
@@ -103,6 +105,7 @@
           "pump_power_sensor": "Pumpenleistung",
           "solar_pump": "Pumpe Solarabsorber",
           "solar_collector_sensor": "Temperatur Solarabsorber",
+          "solar_water_sensor": "Beckenwasser-Temperatur im Solarkreislauf",
           "solar_demand_sensor": "Anforderung Solarheizung",
           "pv_surplus_sensor": "PV-Überschuss"
         },
@@ -123,6 +126,7 @@
           "pump_power_sensor": "Leistung der Filterpumpe als Durchflussindikator (optional).",
           "solar_pump": "Pumpe oder Ventil des Solarabsorbers zur Beckenheizung (optional).",
           "solar_collector_sensor": "Aktiviert die Differenzregelung der Solarheizung (optional).",
+          "solar_water_sensor": "Rohrsensor im Solarkreislauf vor dem Absorber; wird nur bei laufender Absorberpumpe verwendet (optional).",
           "solar_demand_sensor": "Schaltausgang einer vorhandenen Solarheizungs-Steuerung (optional).",
           "pv_surplus_sensor": "Überschuss der Photovoltaikanlage als Binärsensor oder Leistungssensor in W (optional)."
         }
@@ -244,7 +248,8 @@
           "solar_delta_on": "Solarheizung: Einschaltdifferenz",
           "solar_delta_off": "Solarheizung: Ausschaltdifferenz",
           "solar_max_water_temperature": "Solarheizung: maximale Wassertemperatur",
-          "solar_min_switch_minutes": "Solarheizung: minimaler Schaltabstand",
+          "solar_min_on_minutes": "Solarheizung: Mindestlaufzeit",
+          "solar_min_switch_minutes": "Solarheizung: Mindestpause",
           "solar_requires_filter_pump": "Solarabsorber im Filterkreislauf",
           "pv_min_surplus": "PV: minimaler Überschuss",
           "pv_start_delay_minutes": "PV: Startverzögerung",
@@ -253,6 +258,7 @@
         "data_description": {
           "solar_delta_on": "Absorber- minus Wassertemperatur für den Start der Solarheizung.",
           "solar_max_water_temperature": "Oberhalb wird nicht mehr geheizt.",
+          "solar_min_on_minutes": "Verhindert Takten, wenn der Absorber nach dem Start abkühlt.",
           "solar_requires_filter_pump": "An: Die Filterpumpe versorgt den Absorber und läuft während der Solarheizung. Aus: Der Absorber hat einen eigenen Kreislauf mit eigener Pumpe.",
           "pv_min_surplus": "Nur bei einem Leistungssensor.",
           "pv_start_delay_minutes": "So lange muss Überschuss anliegen, bevor die Pumpe startet (durchziehende Wolken).",
