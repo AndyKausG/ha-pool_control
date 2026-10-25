@@ -126,9 +126,9 @@ sections:
       - type: logbook
         hours_to_show: 24
         target:
-          device_id: []
+          entity_id: sensor.pool_status
 ```
 
 Remove cards for entities that do not exist in your setup (for example solar
-or chlorinator entities). For the logbook card select the Pool Control
-device in the card editor.
+or chlorinator entities). The logbook card shows all actions of the
+controller with their reasons.

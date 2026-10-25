@@ -27,7 +27,7 @@ from homeassistant.core import (
     callback,
 )
 from homeassistant.exceptions import HomeAssistantError
-from homeassistant.helpers import issue_registry as ir
+from homeassistant.helpers import entity_registry as er, issue_registry as ir
 from homeassistant.helpers.event import async_call_later, async_track_state_change_event
 from homeassistant.helpers.storage import Store
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator
@@ -455,7 +455,11 @@ class PoolCoordinator(DataUpdateCoordinator[Decision]):
     # ------------------------------------------------------------------
     def _log(self, message: str) -> None:
         _LOGGER.debug(message)
-        async_log_entry(self.hass, self.config_entry.title, message, DOMAIN)
+        # Attach entries to the status sensor so they appear on the device page.
+        status_entity = er.async_get(self.hass).async_get_entity_id(
+            "sensor", DOMAIN, f"{self.config_entry.entry_id}_status"
+        )
+        async_log_entry(self.hass, self.config_entry.title, message, DOMAIN, status_entity)
 
     def _fire(self, event_type: str, **data: Any) -> None:
         self.hass.bus.async_fire(
