@@ -7,7 +7,7 @@
  */
 
 const DOMAIN = "pool_control";
-const VERSION = "1.0.0-beta.1";
+const VERSION = "1.0.0-beta.2";
 
 const STRINGS = {
   en: {
@@ -89,7 +89,8 @@ const STYLE = `
   select { font: inherit; padding: 4px 8px; border-radius: 8px;
     border: 1px solid var(--divider-color); background: var(--card-background-color);
     color: var(--primary-text-color); }
-  svg { width: 100%; height: auto; display: block; }
+  .schematic { display: block; width: 100%; max-width: 560px; max-height: 240px;
+    height: auto; margin: 0 auto; }
   .pipe { fill: none; stroke: var(--disabled-color, #bdbdbd); stroke-width: 6;
     stroke-linecap: round; }
   .pipe.on { stroke: #29a8f0; stroke-dasharray: 10 8; animation: flow 1s linear infinite; }
@@ -277,7 +278,7 @@ class PoolControlCard extends HTMLElement {
       <path d="M${x - 22} ${y} h44 M${x - 7} ${y - 14} v28 M${x + 7} ${y - 14} v28" stroke="${on ? "#0b5cad" : "#9e9e9e"}" stroke-width="1.5"/>`;
 
     return `
-      <svg viewBox="0 0 360 170" role="img">
+      <svg class="schematic" viewBox="0 0 360 170" role="img">
         <defs>
           <linearGradient id="water" x1="0" y1="0" x2="0" y2="1">
             <stop offset="0" stop-color="#5fd3f3"/><stop offset="1" stop-color="#0b5cad"/>
