@@ -161,3 +161,11 @@ sections:
 Remove cards for entities that do not exist in your setup (for example solar
 or chlorinator entities). The logbook card shows all actions of the
 controller with their reasons.
+
+## Troubleshooting
+
+| Symptom | Cause | Solution |
+|---|---|---|
+| *Configuration error* or *Custom element doesn't exist* after an update | The browser still uses the frontend from before the update | Restart Home Assistant after the update, then reload the browser (Ctrl+Shift+R). In the companion app: *Settings > Companion app > Debugging > Reset frontend cache* |
+| Card missing on a wall tablet (Fully Kiosk) | Cached frontend in the WebView | Fully Kiosk: *Settings > Advanced Web Settings > Clear Cache*, then *Reload Start URL* |
+| Card not offered in the card picker | Pool Control is not set up yet | Finish the setup of the integration; the card is registered when it starts |
